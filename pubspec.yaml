@@ -1,0 +1,19 @@
+name: kuchaindart
+description: This library supports kuchain address generation and verification. It enables you to create an offline signature functions of different types of transaction messages. 
+version: 0.0.1
+homepage: https://github.com/keybagio/kuchaindart
+
+environment:
+  sdk: ">=2.2.2 <3.0.0"
+
+dependencies:
+  hex: ^0.1.2
+
+  # Crypto utils
+  bech32: ^0.1.2
+  bip32: ^1.0.5
+  bip39: ^1.0.3
+
+dev_dependencies:
+  test: ^1.9.0
+  coverage: ^0.13.3
