@@ -10,9 +10,11 @@ dependencies:
   hex: ^0.1.2
 
   # Crypto utils
+  base_x: ^1.0.1
   bech32: ^0.1.2
   bip32: ^1.0.5
   bip39: ^1.0.3
+  pointycastle: ^1.0.2
 
 dev_dependencies:
   test: ^1.9.0
