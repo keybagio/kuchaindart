@@ -14,7 +14,6 @@ import 'package:kuchaindart/json_rpc.dart';
 import './utils/bech32_encoder.dart';
 
 class Kuchain {
-
   final String url;
   final String chainId;
   JsonRPC jsonRpc;
@@ -23,20 +22,16 @@ class Kuchain {
   String path = "m/44'/23808'/0'/0/0";
   String bech32MainPrefix = "kuchain";
 
-  Kuchain({
-    this.url,
-    this.chainId
-  }) {
+  Kuchain({this.url, this.chainId}) {
     jsonRpc = JsonRPC(url, http.Client());
   }
 
   /// get address from a mnemonic
-  /// 
+  ///
   /// [mnemonic] BIP39 mnemonic seed
-  /// 
+  ///
   /// Returns the address derived from the provided mnemonic
   String getAddress(String mnemonic) {
-
     // Convert the mnemonic to a seed
     final seed = bip39.mnemonicToSeed(mnemonic);
 
@@ -55,9 +50,9 @@ class Kuchain {
   }
 
   /// get private key from a mnemonic
-  /// 
+  ///
   /// [mnemonic] BIP39 mnemonic seed
-  /// 
+  ///
   /// Returns the private key derived from the provided mnemonic
   Uint8List getECPairPriv(String mnemonic) {
     // Convert the mnemonic to a seed
@@ -73,9 +68,9 @@ class Kuchain {
   }
 
   /// generate public key from ecpairPriv
-  /// 
+  ///
   /// [ecpairPriv] private key
-  /// 
+  ///
   /// Returns string pubkey in base64
   String getPubKeyBase64(Uint8List ecpairPriv) {
     ECPrivateKey ecPrivateKey = _getECPrivateKey(ecpairPriv);
@@ -85,13 +80,14 @@ class Kuchain {
   }
 
   /// sign a transaction with stdMsg and private key
-  /// 
+  ///
   /// [stdSignMsg] standard object of a message
-  /// 
+  ///
   /// [ecpairPriv] private key of transaction sender
-  /// 
+  ///
   /// [modeType] broadcast type
-  Future<dynamic> sign(Map<String, dynamic> stdSignMsg, Uint8List ecpairPriv, [String modeType = "sync"]) async {
+  Future<dynamic> sign(Map<String, dynamic> stdSignMsg, Uint8List ecpairPriv,
+      [String modeType = "sync"]) async {
     // Get standard sign message
     final rsp = await getStdSignMsg(stdSignMsg);
     var signMsg = jsonDecode(rsp.body);
@@ -101,12 +97,13 @@ class Kuchain {
 
     // Convert message to a SHA-256 hash
     final hash = SHA256Digest().process(msgData);
- 
+
     // Sign transaction
     ECPrivateKey ecPrivateKey = _getECPrivateKey(ecpairPriv);
     ECPublicKey ecPublicKey = _getECPublicKey(ecPrivateKey);
 
-    final signObj = TransactionSigner.deriveFrom(hash, ecPrivateKey, ecPublicKey);
+    final signObj =
+        TransactionSigner.deriveFrom(hash, ecPrivateKey, ecPublicKey);
 
     final signatureBase64 = base64Encode(signObj);
 
@@ -144,5 +141,6 @@ class Kuchain {
   }
 
   // ================== JSON RPC =====================
-  Future<Response> getStdSignMsg(Map<String, dynamic> msg) => jsonRpc.getStdSignMsg(msg);
+  Future<Response> getStdSignMsg(Map<String, dynamic> msg) =>
+      jsonRpc.getStdSignMsg(msg);
 }

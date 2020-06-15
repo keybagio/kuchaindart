@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart';
 
 class JsonRPC {
-
   final String url;
   final Client client;
 

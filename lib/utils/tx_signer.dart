@@ -103,7 +103,8 @@ class TransactionSigner {
     final ecdsaSigner = ECDSASigner(null, HMac(SHA256Digest(), 64))
       ..init(true, PrivateKeyParameter(privateKey));
 
-    ECSignature ecSignature = ecdsaSigner.generateSignature(message) as ECSignature;
+    ECSignature ecSignature =
+        ecdsaSigner.generateSignature(message) as ECSignature;
 
     if (ecSignature.s.compareTo(_halfCurveOrder) > 0) {
       final canonicalS = _params.n - ecSignature.s;
