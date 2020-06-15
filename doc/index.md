@@ -66,3 +66,59 @@ final words = child.identifier;
 String address = Bech32Encoder.encode(bech32MainPrefix, words);
 // address = kuchain1ektcysuggtw29g5tql9mgv32fx6nkv90r98h9r
 ```
+
+### 通过 secp256k1 ECDSA 算法对交易签名
+通过 /sign_msg/encode 接口序列化交易信息
+```Dart
+final rsp = await getStdSignMsg(stdSignMsg);
+var signMsg = jsonDecode(rsp.body);
+// signMsg = {msg: eyJhY2NvdW50X251bWJlciI6IjEiLCJjaGFpbl9pZCI6InRlc3RpbmciLCJmZWUiOnsiYW1vdW50IjpbeyJhbW91bnQiOiIxMDAiLCJkZW5vbSI6Imt1Y2hhaW4va2NzIn1dLCJnYXMiOiIyMDAwMDAifSwibWVtbyI6InNlbmQgdmlhIGt1Y2hhaW4iLCJtc2ciOlt7ImFjdGlvbiI6ImNyZWF0ZSIsImFtb3VudCI6W10sImF1dGgiOlsia3VjaGFpbjFmaHFqaHMyMnM0Y3d2anhydmxjeXN0M2g0cHZ3N3g0OWp2azB1eCJdLCJkYXRhIjoiUkp6bytld0tFd29SQVFFRUJERGhBQUFBQUFBQUFBQUFBQUFTRXdvUkFRRUVCRERpQUFBQUFBQUFBQUFBQUFBYUZFM0JLOEZLaFhEbVNNTm44RWd1TjZoWTd4cWwiLCJmcm9tIjoiYWNjMSIsInJvdXRlciI6ImFjY291bnQiLCJ0byI6ImFjYzIifV0sInNlcXVlbmNlIjoiMSJ9}
+```
+
+对message 进行 base64 解码
+```Dart
+final msgData = base64Decode(signMsg['msg'] as String);
+// msgData = [123, 34, 97, 99, 99, 111, 117, 110, 116, 95, 110, 117, 109, 98, 101, 114, 34, 58, 34, 49, 34, 44, 34, 99, 104, 97, 105, 110, 95, 105, 100, 34, 58, 34, 116, 101, 115, 116, 105, 110, 103, 34, 44, 34, 102, 101, 101, 34, 58, 123, 34, 97, 109, ...]
+```
+
+对数据进行 SHA-256 编码
+```Dart
+final hash = SHA256Digest().process(msgData);
+// print(HEX.encode(hash));
+// d415fa76081c0f80358583754e8c70cda7b556f623c7fd6e7109347624e062cd
+```
+
+对数据进行 ECDSA 签名
+```Dart
+ECPrivateKey ecPrivateKey = _getECPrivateKey(ecpairPriv);
+ECPublicKey ecPublicKey = _getECPublicKey(ecPrivateKey);
+final signObj = TransactionSigner.deriveFrom(hash, ecPrivateKey, ecPublicKey);
+// signObj = [212, 239, 145, 249, 255, 228, 35, 1, 163, 10, 195, 82, 177, 28, 30, 80, 170, 213, 136, 248, 5, 144, 114, 79, 51, 245, 183, 73, 205, 64, 92, 94, 113, 67, 112, 4, 204, 62, 74, 85, 95, 2, 246, 244, 22, 99, 35, 31, 5, 247, 159, 75, 169, 185, 61, 224, 193, 67, 27, 232, 80, 33, 197, 84]
+```
+
+对签名进行 base64 编码
+```Dart
+final signatureBase64 = base64Encode(signObj);
+// signatureBase64 = 1O+R+f/kIwGjCsNSsRweUKrViPgFkHJPM/W3Sc1AXF5xQ3AEzD5KVV8C9vQWYyMfBfefS6m5PeDBQxvoUCHFVA==
+```
+
+返回签名结果
+```Dart
+return {
+  "tx": {
+    "msg": stdSignMsg['msg'],
+    "fee": stdSignMsg['fee'],
+    "signatures": [
+      {
+        "signature": signatureBase64,
+        "pub_key": {
+          "type": "tendermint/PubKeySecp256k1",
+          "value": getPubKeyBase64(ecpairPriv)
+        }
+      }
+    ],
+    "memo": stdSignMsg['memo']
+  },
+  "mode": modeType
+};
+```

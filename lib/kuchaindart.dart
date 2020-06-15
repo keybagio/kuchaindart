@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:base_x/base_x.dart';
 import 'package:bip32/bip32.dart' as bip32;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:hex/hex.dart';
@@ -33,39 +32,31 @@ class Kuchain {
 
   /// get address from a mnemonic
   /// 
-  /// [mnemonic] -  BIP39 mnemonic seed
+  /// [mnemonic] BIP39 mnemonic seed
   /// 
   /// Returns the address derived from the provided mnemonic
   String getAddress(String mnemonic) {
-    print("getAddress start");
 
     // Convert the mnemonic to a seed
     final seed = bip39.mnemonicToSeed(mnemonic);
-    print("seed = $seed");
 
     // Convert the seed to a BIP32 instance
     final node = bip32.BIP32.fromSeed(seed);
-    print("node = $node");
 
     // Get the child from the derivation path
     final child = node.derivePath(path);
-    print("child = $child");
-    print("privateKey = ${HEX.encode(child.privateKey)}");
-    print("publicKey = ${HEX.encode(child.publicKey)}");
 
     final words = child.identifier;
-    print("words = $words");
 
     // Bech32 encode
     String address = Bech32Encoder.encode(bech32MainPrefix, words);
-    print("address = $address");
 
     return address;
   }
 
   /// get private key from a mnemonic
   /// 
-  /// [mnemonic] -  BIP39 mnemonic seed
+  /// [mnemonic] BIP39 mnemonic seed
   /// 
   /// Returns the private key derived from the provided mnemonic
   Uint8List getECPairPriv(String mnemonic) {
@@ -81,32 +72,61 @@ class Kuchain {
     return child.privateKey;
   }
 
-  Future<dynamic> sign(Map<String, dynamic> stdSignMsg, Uint8List ecpairPriv) async {
-    final rsp = await getStdSignMsg(stdSignMsg);
-    var signMsg2 = jsonDecode(rsp.body);
-    print("signMsg2 ===========");
-    print(signMsg2);
+  /// generate public key from ecpairPriv
+  /// 
+  /// [ecpairPriv] private key
+  /// 
+  /// Returns string pubkey in base64
+  String getPubKeyBase64(Uint8List ecpairPriv) {
+    ECPrivateKey ecPrivateKey = _getECPrivateKey(ecpairPriv);
+    ECPublicKey ecPublicKey = _getECPublicKey(ecPrivateKey);
+    final pubKeyBase64 = base64.encode(ecPublicKey.Q.getEncoded(true));
+    return pubKeyBase64;
+  }
 
-    var signMsg = {"msg":"eyJhY2NvdW50X251bWJlciI6IjEiLCJjaGFpbl9pZCI6InRlc3RpbmciLCJmZWUiOnsiYW1vdW50IjpbeyJhbW91bnQiOiIxMDAiLCJkZW5vbSI6Imt1Y2hhaW4va2NzIn1dLCJnYXMiOiIyMDAwMDAiLCJwYXllciI6ImFjYzEifSwibWVtbyI6InNlbmQgdmlhIGt1Y2hhaW4iLCJtc2ciOlt7ImFjdGlvbiI6ImNyZWF0ZSIsImFtb3VudCI6W10sImF1dGgiOlsia3VjaGFpbjFmaHFqaHMyMnM0Y3d2anhydmxjeXN0M2g0cHZ3N3g0OWp2azB1eCJdLCJkYXRhIjoiUkp6bytld0tFd29SQVFFRUJERGhBQUFBQUFBQUFBQUFBQUFTRXdvUkFRRUVCRERpQUFBQUFBQUFBQUFBQUFBYUZFM0JLOEZLaFhEbVNNTm44RWd1TjZoWTd4cWwiLCJmcm9tIjoiYWNjMSIsInJvdXRlciI6ImFjY291bnQiLCJ0byI6ImFjYzIifV0sInNlcXVlbmNlIjoiMSJ9"};
+  /// sign a transaction with stdMsg and private key
+  /// 
+  /// [stdSignMsg] standard object of a message
+  /// 
+  /// [ecpairPriv] private key of transaction sender
+  /// 
+  /// [modeType] broadcast type
+  Future<dynamic> sign(Map<String, dynamic> stdSignMsg, Uint8List ecpairPriv, [String modeType = "sync"]) async {
+    // Get standard sign message
+    final rsp = await getStdSignMsg(stdSignMsg);
+    var signMsg = jsonDecode(rsp.body);
 
     // Decode message as base64
-    final base64 = BaseXCodec('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
-    final msgData = base64.decode(signMsg['msg']);
-    print("msgData ========= ");
-    print(msgData);
-    print(msgData);
-    
+    final msgData = base64Decode(signMsg['msg'] as String);
+
     // Convert message to a SHA-256 hash
     final hash = SHA256Digest().process(msgData);
-    print("hash ========= ");
-    print(HEX.encode(hash));
-
+ 
+    // Sign transaction
     ECPrivateKey ecPrivateKey = _getECPrivateKey(ecpairPriv);
     ECPublicKey ecPublicKey = _getECPublicKey(ecPrivateKey);
 
-    final signObj2 = TransactionSigner.deriveFrom(hash, ecPrivateKey, ecPublicKey);
-    print("signObj2 ========= ");
-    print(signObj2);
+    final signObj = TransactionSigner.deriveFrom(hash, ecPrivateKey, ecPublicKey);
+
+    final signatureBase64 = base64Encode(signObj);
+
+    return {
+      "tx": {
+        "msg": stdSignMsg['msg'],
+        "fee": stdSignMsg['fee'],
+        "signatures": [
+          {
+            "signature": signatureBase64,
+            "pub_key": {
+              "type": "tendermint/PubKeySecp256k1",
+              "value": getPubKeyBase64(ecpairPriv)
+            }
+          }
+        ],
+        "memo": stdSignMsg['memo']
+      },
+      "mode": modeType
+    };
   }
 
   /// Returns the associated [privateKey] as an [ECPrivateKey] instance.

@@ -8,9 +8,9 @@ environment:
 
 dependencies:
   hex: ^0.1.2
+  http: ^0.12.0
 
   # Crypto utils
-  base_x: ^1.0.1
   bech32: ^0.1.2
   bip32: ^1.0.5
   bip39: ^1.0.3

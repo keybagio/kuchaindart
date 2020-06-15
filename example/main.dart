@@ -27,12 +27,13 @@ void main() async {
   print("ecpairPriv ======================");
   print(ecpairPriv);
 
-  const msg = {"type":"kuchain/Tx","value":{"msg":[{"type":"account/createMsg","value":{"KuMsg":{"auth":["kuchain1fg3svnqcv9wcln0q5cwdcm0uk8a4hwqvng26sh"],"from":"validator","to":"acc1","amount":[],"router":"account","action":"create","data":"RJzo+ewKEwoRAQEJWBMJEBUPSAAAAAAAAAASEwoRAQEEBDDhAAAAAAAAAAAAAAAaFGNKvkbeXeCYw7nKG0NH7crAl8Km"}}}],"fee":{"amount":[{"denom":"stake","amount":"50"}],"gas":"200000","payer":""},"signatures":null,"memo":"Sent via Kuchain"}};
+  const msg = {"chain_id":"testing","account_number":"1","sequence":"1","msg":[{"type":"account/createMsg","value":{"KuMsg":{"auth":["kuchain1fhqjhs22s4cwvjxrvlcyst3h4pvw7x49jvk0ux"],"from":"acc1","to":"acc2","amount":[],"router":"account","action":"create","data":"RJzo+ewKEwoRAQEEBDDhAAAAAAAAAAAAAAASEwoRAQEEBDDiAAAAAAAAAAAAAAAaFE3BK8FKhXDmSMNn8EguN6hY7xql"}}}],"fee":{"amount":[{"denom":"kuchain/kcs","amount":"100"}],"gas":"200000","payer":"acc1"},"memo":"send via kuchain"};
   final signedTx = await kuchain.sign(msg, ecpairPriv);
   print("signedTx ======================");
   print(signedTx);
 
   // JSON RPC Test
+  print("JsonRPC Test ======================");
   JsonRPC rpc = JsonRPC(url, http.Client());
 
   final stdSignMsg = await rpc.getStdSignMsg(msg);
