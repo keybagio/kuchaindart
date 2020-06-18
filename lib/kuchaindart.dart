@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:bip32/bip32.dart' as bip32;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:hex/hex.dart';
-import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:pointycastle/ecc/curves/secp256k1.dart';
