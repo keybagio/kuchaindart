@@ -5,6 +5,7 @@ import 'package:bip39/bip39.dart' as bip39;
 import 'package:hex/hex.dart';
 import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
+import 'package:meta/meta.dart';
 import 'package:pointycastle/ecc/curves/secp256k1.dart';
 import 'package:pointycastle/export.dart';
 import 'package:pointycastle/pointycastle.dart';
@@ -13,20 +14,24 @@ import 'package:kuchaindart/utils/tx_signer.dart';
 import 'package:kuchaindart/json_rpc.dart';
 import './utils/bech32_encoder.dart';
 
-class Kuchain {
+class Kuchain extends JsonRPC {
   final String url;
   final String chainId;
-  JsonRPC jsonRpc;
 
   // m/purpse'/coin_type'/account'/change/address_index
   String path = "m/44'/23808'/0'/0/0";
   String bech32MainPrefix = "kuchain";
 
-  Kuchain({this.url, this.chainId}) {
-    jsonRpc = JsonRPC(url, http.Client());
-  }
+  Kuchain({
+    @required this.url, 
+    @required this.chainId,
+  }) : super(
+    url: url, 
+    chainId: chainId, 
+    client: http.Client()
+  );
 
-  /// get address from a mnemonic
+  /// Get address from a mnemonic
   ///
   /// [mnemonic] BIP39 mnemonic seed
   ///
@@ -49,7 +54,7 @@ class Kuchain {
     return address;
   }
 
-  /// get private key from a mnemonic
+  /// Get private key from a mnemonic
   ///
   /// [mnemonic] BIP39 mnemonic seed
   ///
@@ -67,7 +72,7 @@ class Kuchain {
     return child.privateKey;
   }
 
-  /// generate public key from ecpairPriv
+  /// generate public key from ecpairPriv in base64
   ///
   /// [ecpairPriv] private key
   ///
@@ -79,6 +84,37 @@ class Kuchain {
     return pubKeyBase64;
   }
 
+  /// Generate public key from ecpairPriv
+  ///
+  /// [ecpairPriv] private key
+  ///
+  /// Returns Uint8List pubkey
+  Uint8List getPubKey(Uint8List ecpairPriv) {
+    ECPrivateKey ecPrivateKey = _getECPrivateKey(ecpairPriv);
+    ECPublicKey ecPublicKey = _getECPublicKey(ecPrivateKey);
+    return ecPublicKey.Q.getEncoded(true);
+  }
+
+  /// Set bech32 main prefix
+  /// [bech32MainPrefix] bech32 main prefix
+  void setBech32MainPrefix(String bech32MainPrefix) {
+    this.bech32MainPrefix = bech32MainPrefix;
+
+    if (this.bech32MainPrefix == null || this.bech32MainPrefix.isEmpty) {
+		  throw Exception("bech32MainPrefix object was not set or invalid");
+	  }
+  }
+
+  /// Set path
+  /// [path] path - m/purpse'/coin_type'/account'/change/address_index
+  void setPath(String path) {
+    this.path = path;
+
+    if (this.path == null || this.path.isEmpty) {
+		  throw Exception("path object was not set or invalid");
+	  }
+  }
+
   /// sign a transaction with stdMsg and private key
   ///
   /// [stdSignMsg] standard object of a message
@@ -86,7 +122,7 @@ class Kuchain {
   /// [ecpairPriv] private key of transaction sender
   ///
   /// [modeType] broadcast type
-  Future<dynamic> sign(Map<String, dynamic> stdSignMsg, Uint8List ecpairPriv,
+  Future<Map<String, dynamic>> sign(Map<String, dynamic> stdSignMsg, Uint8List ecpairPriv,
       [String modeType = "sync"]) async {
     // Get standard sign message
     final rsp = await getStdSignMsg(stdSignMsg);
@@ -139,8 +175,4 @@ class Kuchain {
     final curvePoint = point * _ecPrivateKey.d;
     return ECPublicKey(curvePoint, ECCurve_secp256k1());
   }
-
-  // ================== JSON RPC =====================
-  Future<Response> getStdSignMsg(Map<String, dynamic> msg) =>
-      jsonRpc.getStdSignMsg(msg);
 }

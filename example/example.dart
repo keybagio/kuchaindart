@@ -1,9 +1,9 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:bip39/bip39.dart' as bip39;
-import 'package:http/http.dart' as http;
+import 'package:hex/hex.dart';
 import 'package:kuchaindart/kuchaindart.dart';
-import 'package:kuchaindart/json_rpc.dart';
 
 void main() async {
   print("main start");
@@ -16,6 +16,10 @@ void main() async {
     chainId: chainId,
   );
 
+  // Configure your own information
+  const myAddress = "kuchain1ektcysuggtw29g5tql9mgv32fx6nkv90r98h9r";
+  const myAccount = "test1";
+
   String testMnemonic = bip39.generateMnemonic();
   print(testMnemonic);
 
@@ -27,47 +31,60 @@ void main() async {
 
   final ecpairPriv = kuchain.getECPairPriv(mnemonic);
   print("ecpairPriv ======================");
-  print(ecpairPriv);
+  print(HEX.encode(ecpairPriv));
 
-  const msg = {
-    "chain_id": "testing",
-    "account_number": "1",
-    "sequence": "1",
-    "msg": [
-      {
-        "type": "account/createMsg",
-        "value": {
-          "KuMsg": {
-            "auth": ["kuchain1fhqjhs22s4cwvjxrvlcyst3h4pvw7x49jvk0ux"],
-            "from": "acc1",
-            "to": "acc2",
-            "amount": [],
-            "router": "account",
-            "action": "create",
-            "data":
-                "RJzo+ewKEwoRAQEEBDDhAAAAAAAAAAAAAAASEwoRAQEEBDDiAAAAAAAAAAAAAAAaFE3BK8FKhXDmSMNn8EguN6hY7xql"
-          }
-        }
-      }
-    ],
-    "fee": {
-      "amount": [
-        {"denom": "kuchain/kcs", "amount": "100"}
-      ],
-      "gas": "200000",
-      "payer": "acc1"
-    },
-    "memo": "send via kuchain"
-  };
-  final signedTx = await kuchain.sign(msg, ecpairPriv);
-  print("signedTx ======================");
-  print(signedTx);
+  String getPubKeyBase64 = kuchain.getPubKeyBase64(ecpairPriv);
+  print("getPubKeyBase64 ======================");
+  print(getPubKeyBase64);
 
-  // JSON RPC Test
-  print("JsonRPC Test ======================");
-  JsonRPC rpc = JsonRPC(url, http.Client());
+  Uint8List getPubKey = kuchain.getPubKey(ecpairPriv);
+  print("getPubKey ======================");
+  print(getPubKey);
+ 
+  // ====================================
+  //          Get account info
+  // ====================================
+  final accountInfo = await kuchain.getAccount(myAccount);
+  print("getAccount ======================");
+  print(accountInfo);
 
-  final stdSignMsg = await rpc.getStdSignMsg(msg);
-  final data = jsonDecode(stdSignMsg.body) as Map<String, dynamic>;
-  print(data);
+  // ====================================
+  //            Create account
+  // ====================================
+  // final newCreateAccMsg = await kuchain.newCreateAccMsg(
+  //   myAccount,
+  //   "test4",
+  //   myAddress,
+  // );
+  // print("newCreateAccMsg ======================");
+  // print(newCreateAccMsg);
+
+  // final signedCreateAccMsgTx = await kuchain.sign(newCreateAccMsg, ecpairPriv);
+  // print("signedCreateAccMsgTx ======================");
+  // print(signedCreateAccMsgTx);
+
+  // final createAccRes = await kuchain.broadcast(signedCreateAccMsgTx);
+  // print("createAccRes ======================");
+  // print(createAccRes);
+
+
+  // ====================================
+  //              Transfer
+  // ====================================
+  final newTransferMsg = await kuchain.newTransferMsg(
+    myAccount,
+    "test4",
+    "10000kuchain/kcs",
+  );
+  print("newTransferMsg ======================");
+  print(json.encode(newTransferMsg));
+
+  final signedNewTransferMsgTx = await kuchain.sign(newTransferMsg, ecpairPriv);
+  print("signedNewTransferMsgTx ======================");
+  print(signedNewTransferMsgTx);
+  print(json.encode(signedNewTransferMsgTx));
+
+  final transferRes = await kuchain.broadcast(signedNewTransferMsgTx);
+  print("transferRes ======================");
+  print(transferRes);
 }
