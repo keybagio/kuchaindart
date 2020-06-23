@@ -51,4 +51,7 @@ This library is simple and easy to use. We don't have any formal documentation y
 ```
 // Format code
 dartfmt -w lib example
+
+// Publish validation
+ pub publish --dry-run --verbose
 ```
