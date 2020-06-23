@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:bip32/bip32.dart' as bip32;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:hex/hex.dart';
-import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:pointycastle/ecc/curves/secp256k1.dart';
@@ -23,13 +22,9 @@ class Kuchain extends JsonRPC {
   String bech32MainPrefix = "kuchain";
 
   Kuchain({
-    @required this.url, 
+    @required this.url,
     @required this.chainId,
-  }) : super(
-    url: url, 
-    chainId: chainId, 
-    client: http.Client()
-  );
+  }) : super(url: url, chainId: chainId, client: http.Client());
 
   /// Get address from a mnemonic
   ///
@@ -46,12 +41,32 @@ class Kuchain extends JsonRPC {
     // Get the child from the derivation path
     final child = node.derivePath(path);
 
+    // Get a Hash160 from the public key
     final words = child.identifier;
 
     // Bech32 encode
     String address = Bech32Encoder.encode(bech32MainPrefix, words);
 
     return address;
+  }
+
+  String getAddressFromPrivateKeyHex(String privateKeyHex) {
+    // Get the curve data
+    final secp256k1 = ECCurve_secp256k1();
+    final point = secp256k1.G;
+
+    // Compute the curve point associated to the private key
+    final bigInt = BigInt.parse(privateKeyHex, radix: 16);
+    final curvePoint = point * bigInt;
+
+    // Get the public key
+    final publicKeyBytes = curvePoint.getEncoded();
+
+    // Get the address
+    final sha256Digest = SHA256Digest().process(publicKeyBytes);
+    final address = RIPEMD160Digest().process(sha256Digest);
+
+    return Bech32Encoder.encode(bech32MainPrefix, address);
   }
 
   /// Get private key from a mnemonic
@@ -101,8 +116,8 @@ class Kuchain extends JsonRPC {
     this.bech32MainPrefix = bech32MainPrefix;
 
     if (this.bech32MainPrefix == null || this.bech32MainPrefix.isEmpty) {
-		  throw Exception("bech32MainPrefix object was not set or invalid");
-	  }
+      throw Exception("bech32MainPrefix object was not set or invalid");
+    }
   }
 
   /// Set path
@@ -111,8 +126,8 @@ class Kuchain extends JsonRPC {
     this.path = path;
 
     if (this.path == null || this.path.isEmpty) {
-		  throw Exception("path object was not set or invalid");
-	  }
+      throw Exception("path object was not set or invalid");
+    }
   }
 
   /// sign a transaction with stdMsg and private key
@@ -122,7 +137,8 @@ class Kuchain extends JsonRPC {
   /// [ecpairPriv] private key of transaction sender
   ///
   /// [modeType] broadcast type
-  Future<Map<String, dynamic>> sign(Map<String, dynamic> stdSignMsg, Uint8List ecpairPriv,
+  Future<Map<String, dynamic>> sign(
+      Map<String, dynamic> stdSignMsg, Uint8List ecpairPriv,
       [String modeType = "sync"]) async {
     // Get standard sign message
     final rsp = await getStdSignMsg(stdSignMsg);

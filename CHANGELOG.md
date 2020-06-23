@@ -1,3 +1,6 @@
+## Version 0.1.1 - 2020-06-23
+* Added getAddressFromPrivateKeyHex api
+
 ## Version 0.1.0 - 2020-06-18
 * Added some rpc api
 * Added some examples inside the `example/` folder

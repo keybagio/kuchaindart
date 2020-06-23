@@ -16,7 +16,8 @@ class TransactionSigner {
     radix: 16,
   );
 
-  static BigInt _bytesToInt(List<int> bytes) => _decodeBigInt(bytes as Uint8List);
+  static BigInt _bytesToInt(List<int> bytes) =>
+      _decodeBigInt(bytes as Uint8List);
 
   static Uint8List _intToBytes(BigInt number) => _encodeBigInt(number);
 

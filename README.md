@@ -46,3 +46,9 @@ This library is simple and easy to use. We don't have any formal documentation y
 ## Contribution
 
 - Contributions, suggestions, improvements, and feature requests are always welcome
+
+## Script
+```
+// Format code
+dartfmt -w lib example
+```

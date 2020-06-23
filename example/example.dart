@@ -19,6 +19,8 @@ void main() async {
   // Configure your own information
   const myAddress = "kuchain1ektcysuggtw29g5tql9mgv32fx6nkv90r98h9r";
   const myAccount = "test1";
+  const myPrivatKeyHex =
+      "8c44ff31bf84292b316aee425b4ebb1b3e95fcf790fd163c8d5fa64418706f7d";
 
   String testMnemonic = bip39.generateMnemonic();
   print(testMnemonic);
@@ -28,6 +30,11 @@ void main() async {
   String address = kuchain.getAddress(mnemonic);
   print("address ======================");
   print(address);
+
+  String addressFromPrivateKey =
+      kuchain.getAddressFromPrivateKeyHex(myPrivatKeyHex);
+  print("addressFromPrivateKey ======================");
+  print(addressFromPrivateKey);
 
   final ecpairPriv = kuchain.getECPairPriv(mnemonic);
   print("ecpairPriv ======================");
@@ -40,7 +47,7 @@ void main() async {
   Uint8List getPubKey = kuchain.getPubKey(ecpairPriv);
   print("getPubKey ======================");
   print(getPubKey);
- 
+
   // ====================================
   //          Get account info
   // ====================================
@@ -66,7 +73,6 @@ void main() async {
   // final createAccRes = await kuchain.broadcast(signedCreateAccMsgTx);
   // print("createAccRes ======================");
   // print(createAccRes);
-
 
   // ====================================
   //              Transfer
