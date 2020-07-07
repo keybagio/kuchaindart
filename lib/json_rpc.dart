@@ -44,7 +44,7 @@ class JsonRPC {
     ).then((response) => json.decode(response.body) as Map<String, dynamic>);
   }
 
-  /// get accounts info by `address`
+  /// get accounts info from `address`
   ///
   /// [address] address of kuchain
   ///
@@ -71,6 +71,21 @@ class JsonRPC {
 
     return _httpGet(
       url + authApi + auth,
+    ).then((response) => json.decode(response.body) as Map<String, dynamic>);
+  }
+
+  /// get coins info from `account` or `address`
+  ///
+  /// [account] account or address of kuchain
+  ///
+  /// Returns coins infos in JSON
+  Future<Map<String, dynamic>> getCoins(
+    String account,
+  ) async {
+    const coinsApi = "/assets/coins/";
+
+    return _httpGet(
+      url + coinsApi + account,
     ).then((response) => json.decode(response.body) as Map<String, dynamic>);
   }
 

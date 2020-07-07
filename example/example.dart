@@ -63,6 +63,13 @@ void main() async {
   print(accountInfo);
 
   // ====================================
+  //          Get coins info
+  // ====================================
+  final coinsInfo = await kuchain.getCoins(myAddress);
+  print("getCoins ======================");
+  print(coinsInfo);
+
+  // ====================================
   //            Create account
   // ====================================
   // final newCreateAccMsg = await kuchain.newCreateAccMsg(
