@@ -8,6 +8,7 @@ const defaultFee = "100";
 const defaultGas = "200000";
 const defaultGasAdjustment = "1.2";
 const defaultCoin = "kuchain/kcs";
+const nameStrLenMax = 17;
 
 class JsonRPC {
   final String url;
@@ -43,6 +44,21 @@ class JsonRPC {
     ).then((response) => json.decode(response.body) as Map<String, dynamic>);
   }
 
+  /// get accounts info by `address`
+  ///
+  /// [address] address of kuchain
+  ///
+  /// Returns accounts in JSON
+  Future<Map<String, dynamic>> getAccounts(
+    String address,
+  ) async {
+    const accountsApi = "/accounts/";
+
+    return _httpGet(
+      url + accountsApi + address,
+    ).then((response) => json.decode(response.body) as Map<String, dynamic>);
+  }
+
   /// get auth info from `auth`
   ///
   /// [auth] auth(address) of an account in kuchain
@@ -55,6 +71,21 @@ class JsonRPC {
 
     return _httpGet(
       url + authApi + auth,
+    ).then((response) => json.decode(response.body) as Map<String, dynamic>);
+  }
+
+  /// get txs info from `hash`
+  ///
+  /// [hash] Tx hash
+  ///
+  /// Returns txs infos in JSON
+  Future<Map<String, dynamic>> getTxs(
+    String hash,
+  ) async {
+    const txsApi = "/txs/";
+
+    return _httpGet(
+      url + txsApi + hash,
     ).then((response) => json.decode(response.body) as Map<String, dynamic>);
   }
 
@@ -164,6 +195,7 @@ class JsonRPC {
   /// [canLock] if can be locked
   /// [issueToHeight] issue_to_height
   /// [initSupply] init_supply
+  /// [desc] desc of coin
   /// [fee] fees = gas * gas-prices
   /// [gas] a special unit that is used to track the consumption of resources during execution
   /// [memo] memo
@@ -178,6 +210,7 @@ class JsonRPC {
       bool canLock,
       String issueToHeight,
       String initSupply,
+      String desc,
       [String fee = defaultFee,
       String gas = defaultGas,
       String memo = defaultMemo,
@@ -192,6 +225,7 @@ class JsonRPC {
       "can_lock": canLock,
       "issue_to_height": issueToHeight,
       "init_supply": initSupply,
+      "desc": desc,
     };
 
     final msg = await _httpPost(url + createApi,
@@ -232,17 +266,28 @@ class JsonRPC {
 
   /// Sort Msg
   ///
+  /// `Account Sender`
   /// 1. Get account info to find `address`
-  /// 2. Get auth info to to find `account number` and `sequence`
+  /// 2. Get auth info to find `account number` and `sequence`
+  /// `Address Sender`
+  /// 1. Get auth info to find `account number` and `sequence`
+  ///
   /// [msg] Msg which to sort
   /// [sender] transaction sender
   ///
   /// Return sorted Msg
   Future<Map<String, dynamic>> _sortMsg(
       Map<String, dynamic> msg, String sender) async {
-    final acc = await getAccount(sender);
-    final auth =
-        await getAuth(acc["result"]["value"]["auths"][0]["address"] as String);
+    Map<String, dynamic> acc, auth;
+
+    if (sender.length <= nameStrLenMax) {
+      acc = await getAccount(sender);
+      auth = await getAuth(
+          acc["result"]["value"]["auths"][0]["address"] as String);
+    } else {
+      auth = await getAuth(sender);
+    }
+
     return {
       "chain_id": chainId,
       "account_number": auth["result"]["number"],
@@ -254,28 +299,28 @@ class JsonRPC {
   }
 
   Future<Response> _httpGet(url, {Map<String, String> headers}) async {
-    print("_httpGet url ================");
-    print(url);
+    // print("_httpGet url ================");
+    // print(url);
 
     final response = await client.get(url, headers: headers);
 
-    print("_httpGet response================");
-    print(response.body);
+    // print("_httpGet response================");
+    // print(response.body);
     return response;
   }
 
   Future<Response> _httpPost(url,
       {Map<String, String> headers, body, Encoding encoding}) async {
-    print("_httpPost url ================");
-    print(url);
-    print("_httpPost body ================");
-    print(body);
+    // print("_httpPost url ================");
+    // print(url);
+    // print("_httpPost body ================");
+    // print(body);
 
     final response = await client.post(url,
         headers: headers, body: body, encoding: encoding);
 
-    print("_httpPost response================");
-    print(response.body);
+    // print("_httpPost response================");
+    // print(response.body);
     return response;
   }
 }

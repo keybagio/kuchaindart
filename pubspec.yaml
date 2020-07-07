@@ -1,6 +1,6 @@
 name: kuchaindart
 description: This library supports kuchain address generation and verification. It enables you to create an offline signature functions of different types of transaction messages. 
-version: 0.1.1
+version: 0.1.2
 author: KY <harrykyguo@gmail.com>
 homepage: https://github.com/keybagio/kuchaindart
 

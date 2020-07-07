@@ -1,6 +1,6 @@
 # Kuchain Dart Library 
 
-Convert from [testkuchainjs@0.1.4](https://www.npmjs.com/package/testkuchainjs)
+Convert from [testkuchainjs@0.1.9](https://www.npmjs.com/package/testkuchainjs)
 
 This library supports kuchain address generation and verification. It enables you to create an offline signature functions of different types of transaction messages. 
 
@@ -26,14 +26,20 @@ final ecpairPriv = kuchain.getECPairPriv(mnemonic);
 - Create an account with a specialized auth.
 
 ```dart
-// TODO kuchain.newCreateAccMsg
+final newCreateAccMsg = await kuchain.newCreateAccMsg(
+  "validator",
+  "acc1",
+  auth,
+);
+print(newCreateAccMsg);
 ```
 
 - Sign transaction by using sign and broadcast which use REST API of Kuchain
 
 ```dart
 final signedTx = await kuchain.sign(msg, ecpairPriv);
-// TODO kuchain.broadcast
+final broadcastRes = await kuchain.broadcast(signedTx);
+print(broadcastRes);
 ```
 
 ## Supporting Message Types (Updating...)
@@ -53,5 +59,8 @@ This library is simple and easy to use. We don't have any formal documentation y
 dartfmt -w lib example
 
 // Publish validation
- pub publish --dry-run --verbose
+pub publish --dry-run --verbose
+
+// Publish
+pub publish --verbose --server https://pub.dartlang.org
 ```

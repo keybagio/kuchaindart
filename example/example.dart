@@ -49,6 +49,13 @@ void main() async {
   print(getPubKey);
 
   // ====================================
+  //          Get accounts from address
+  // ====================================
+  final accounts = await kuchain.getAccounts(myAddress);
+  print("getAccounts ======================");
+  print(accounts);
+
+  // ====================================
   //          Get account info
   // ====================================
   final accountInfo = await kuchain.getAccount(myAccount);

@@ -1,3 +1,7 @@
+## Version 0.1.2 - 2020-07-07
+* Added `getAccounts` & `getTxs` api
+* Modify `newCreateCoinMsg` api
+
 ## Version 0.1.1 - 2020-06-23
 * Added getAddressFromPrivateKeyHex api
 
