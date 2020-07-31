@@ -454,6 +454,43 @@ class JsonRPC {
     return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, delegator);
   }
 
+  /// construct Proposal Msg in JSON
+  /// 
+  /// [title] title of proposal to be propose
+  /// [description] description of proposal to be propose
+  /// [initialDeposit] accoinitial deposit of this proposal
+  /// [proposer] proposer of this proposal
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [gasAdjustment] max gas consumption rate of a transaction can take
+  ///
+  /// Returns standard message of Proposal
+  Future<Map<String, dynamic>> newProposalMsg(
+      String title,
+      String description,
+      String initialDeposit,
+      String proposer,
+      [String fee = defaultFee,
+      String gas = defaultGas,
+      String memo = defaultMemo,
+      String gasAdjustment = defaultGasAdjustment]) async {
+    const proposalApi = "/gov/proposals";
+    final reqData = {
+      "base_req": _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, proposer),
+      title: title,
+      description: description,
+      "initial_deposit": initialDeposit,
+      "proposer_acc": proposer
+    };
+
+    final msg = await _httpPost(url + proposalApi,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(reqData));
+
+    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, proposer);
+  }
+
   /// post a signed transaction to blockchain
   ///
   /// [signedTx] signed transaction
