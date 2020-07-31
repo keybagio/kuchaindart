@@ -250,6 +250,210 @@ class JsonRPC {
     return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, creator);
   }
 
+  /// construct IssueCoin Msg in JSON
+  ///
+  /// [creator] account ID of creator
+  /// [symbol] symbol of coin to be created(eg. btc, eos)
+  /// [amount] amount of coin to be issued
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [gasAdjustment] max gas consumption rate of a transaction can take
+  ///
+  /// Returns standard message of CreateCoin
+  Future<Map<String, dynamic>> newIssueCoinMsg(
+      String creator,
+      String symbol,
+      String amount,
+      [String fee = defaultFee,
+      String gas = defaultGas,
+      String memo = defaultMemo,
+      String gasAdjustment = defaultGasAdjustment]) async {
+    const issueApi = "/assets/issue";
+    final reqData = {
+      "base_req": _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, creator),
+      "creator": creator,
+      "symbol": symbol,
+      "amount": amount,
+    };
+
+    final msg = await _httpPost(url + issueApi,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(reqData));
+
+    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, creator);
+  }
+
+  /// construct LockCoin Msg in JSON
+  ///
+  /// [account] account ID of locking coin
+  /// [unlockBlockHeight] height that coin can be unlocked
+  /// [amount] amount of coin to be issued
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [gasAdjustment] max gas consumption rate of a transaction can take
+  ///
+  /// Returns standard message of LockCoin
+  Future<Map<String, dynamic>> newLockCoinMsg(
+      String account,
+      String unlockBlockHeight,
+      String amount,
+      [String fee = defaultFee,
+      String gas = defaultGas,
+      String memo = defaultMemo,
+      String gasAdjustment = defaultGasAdjustment]) async {
+    const lockApi = "/assets/lock";
+    final reqData = {
+      "base_req": _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, account),
+      "account": account,
+      "unlock_block_height": unlockBlockHeight,
+      "amount": amount,
+    };
+
+    final msg = await _httpPost(url + lockApi,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(reqData));
+
+    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, account);
+  }
+
+  /// construct UnlockCoin Msg in JSON
+  ///
+  /// [account] account ID of locking coin
+  /// [amount] amount of coin to be issued
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [gasAdjustment] max gas consumption rate of a transaction can take
+  ///
+  /// Returns standard message of UnlockCoin
+  Future<Map<String, dynamic>> newUnlockCoinMsg(
+      String account,
+      String amount,
+      [String fee = defaultFee,
+      String gas = defaultGas,
+      String memo = defaultMemo,
+      String gasAdjustment = defaultGasAdjustment]) async {
+    const unlockApi = "/assets/lock";
+    final reqData = {
+      "base_req": _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, account),
+      "account": account,
+      "amount": amount,
+    };
+
+    final msg = await _httpPost(url + unlockApi,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(reqData));
+
+    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, account);
+  }
+
+  /// construct Delegation Msg in JSON
+  /// 
+  /// [delegator] account ID of delegator
+  /// [validator] account ID of validator
+  /// [amount] amount of coin to be issued
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [gasAdjustment] max gas consumption rate of a transaction can take
+  ///
+  /// Returns standard message of Delegation
+  Future<Map<String, dynamic>> newDelegationMsg(
+      String delegator,
+      String validator,
+      String amount,
+      [String fee = defaultFee,
+      String gas = defaultGas,
+      String memo = defaultMemo,
+      String gasAdjustment = defaultGasAdjustment]) async {
+    const delegationApi = "/assets/delegations";
+    final reqData = {
+      "base_req": _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, delegator),
+      "delegator_acc": delegator,
+      "validator_acc": validator,
+      "amount": amount,
+    };
+
+    final msg = await _httpPost(url + delegationApi,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(reqData));
+
+    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, delegator);
+  }
+
+  /// construct Unbonding Msg in JSON
+  /// 
+  /// [delegator] account ID of delegator
+  /// [validator] account ID of validator
+  /// [amount] amount of coin to be issued
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [gasAdjustment] max gas consumption rate of a transaction can take
+  ///
+  /// Returns standard message of Unbonding
+  Future<Map<String, dynamic>> newUnbondingMsg(
+      String delegator,
+      String validator,
+      String amount,
+      [String fee = defaultFee,
+      String gas = defaultGas,
+      String memo = defaultMemo,
+      String gasAdjustment = defaultGasAdjustment]) async {
+    const delegationApi = "/staking/unbonding_delegations";
+    final reqData = {
+      "base_req": _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, delegator),
+      "delegator_acc": delegator,
+      "validator_acc": validator,
+      "amount": amount,
+    };
+
+    final msg = await _httpPost(url + delegationApi,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(reqData));
+
+    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, delegator);
+  }
+
+  /// construct Redelegation Msg in JSON
+  /// 
+  /// [delegator] account ID of delegator
+  /// [validatorSrc] account ID of validator redelegated from
+  /// [validatorDst] account ID of validator redelegated to
+  /// [amount] amount of coin to be issued
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [gasAdjustment] max gas consumption rate of a transaction can take
+  ///
+  /// Returns standard message of Redelegation
+  Future<Map<String, dynamic>> newRedelegationMsg(
+      String delegator,
+      String validatorSrc,
+      String validatorDst,
+      String amount,
+      [String fee = defaultFee,
+      String gas = defaultGas,
+      String memo = defaultMemo,
+      String gasAdjustment = defaultGasAdjustment]) async {
+    const delegationApi = "/staking/redelegations";
+    final reqData = {
+      "base_req": _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, delegator),
+      "delegator_acc": delegator,
+      "validator_src_acc": validatorSrc,
+      "validator_dst_acc": validatorDst,
+      "amount": amount
+    };
+
+    final msg = await _httpPost(url + delegationApi,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(reqData));
+
+    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, delegator);
+  }
+
   /// post a signed transaction to blockchain
   ///
   /// [signedTx] signed transaction
