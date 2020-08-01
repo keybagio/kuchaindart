@@ -491,6 +491,240 @@ class JsonRPC {
     return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, proposer);
   }
 
+  /// construct ProposalParamChange Msg in JSON
+  /// 
+  /// [title] title of proposal to be propose
+  /// [description] description of proposal to be propose
+  /// [initialDeposit] accoinitial deposit of this proposal
+  /// [proposer] proposer of this proposal
+  /// [subspace] subspace
+  /// [key] key
+  /// [value] value
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [gasAdjustment] max gas consumption rate of a transaction can take
+  ///
+  /// Returns standard message of ProposalParamChange
+  Future<Map<String, dynamic>> newProposalParamMsg(
+      String title,
+      String description,
+      String initialDeposit,
+      String proposer,
+      String subspace,
+      String key,
+      String value,
+      [String fee = defaultFee,
+      String gas = defaultGas,
+      String memo = defaultMemo,
+      String gasAdjustment = defaultGasAdjustment]) async {
+    const proposalApi = "/gov/proposals/param_change";
+    final reqData = {
+      "base_req": _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, proposer),
+      title: title,
+      description: description,
+      "initial_deposit": initialDeposit,
+      "proposer_acc": proposer,
+      "param_changes": [{
+        subspace: subspace,
+        key: key,
+        value: value
+      }]
+    };
+
+    final msg = await _httpPost(url + proposalApi,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(reqData));
+
+    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, proposer);
+  }
+
+  /// construct Deposit Msg in JSON
+  /// 
+  /// [proposalId] proposal ID
+  /// [depositor] depositor of proposal to be propose
+  /// [amount] amount of coin to be deposit
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [gasAdjustment] max gas consumption rate of a transaction can take
+  ///
+  /// Returns standard message of Deposit
+  Future<Map<String, dynamic>> newDepositMsg(
+      String proposalId,
+      String depositor,
+      String amount,
+      [String fee = defaultFee,
+      String gas = defaultGas,
+      String memo = defaultMemo,
+      String gasAdjustment = defaultGasAdjustment]) async {
+    const proposalApi = "/gov/deposits";
+    final reqData = {
+      "base_req": _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, depositor),
+      "proposal_id": proposalId,
+      depositor: depositor,
+      amount: amount,
+    };
+
+    final msg = await _httpPost(url + proposalApi,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(reqData));
+
+    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, depositor);
+  }
+
+  /// construct Vote Msg in JSON
+  /// 
+  /// [proposalId] proposal ID
+  /// [voter] vote of this proposal
+  /// [option] vote option (eg. yes|abstain|no|no_with_veto)
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [gasAdjustment] max gas consumption rate of a transaction can take
+  ///
+  /// Returns standard message of Vote
+  Future<Map<String, dynamic>> newVoteMsg(
+      String proposalId,
+      String voter,
+      String option,
+      [String fee = defaultFee,
+      String gas = defaultGas,
+      String memo = defaultMemo,
+      String gasAdjustment = defaultGasAdjustment]) async {
+    const voteApi = "/gov/votes";
+    final reqData = {
+      "base_req": _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, voter),
+      "proposal_id": proposalId,
+      voter: voter,
+      option: option,
+    };
+
+    final msg = await _httpPost(url + voteApi,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(reqData));
+
+    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, voter);
+  }
+
+  /// construct DelegatorReward Msg in JSON
+  /// 
+  /// [delegator] proposal ID
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [gasAdjustment] max gas consumption rate of a transaction can take
+  ///
+  /// Returns standard message of DelegatorReward
+  Future<Map<String, dynamic>> newDelegatorReward(
+      String delegator,
+      [String fee = defaultFee,
+      String gas = defaultGas,
+      String memo = defaultMemo,
+      String gasAdjustment = defaultGasAdjustment]) async {
+    const rewardApi = "/distribution/delegators/rewards";
+    final reqData = {
+      "base_req": _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, delegator),
+      "delegator_acc": delegator,
+    };
+
+    final msg = await _httpPost(url + rewardApi,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(reqData));
+
+    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, delegator);
+  }
+
+  /// construct DelegatorValidatorReward Msg in JSON
+  /// 
+  /// [delegator] account ID of delegator
+  /// [validator] account ID of validator
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [gasAdjustment] max gas consumption rate of a transaction can take
+  ///
+  /// Returns standard message of DelegatorValidatorReward
+  Future<Map<String, dynamic>> newDelegatorValidatorReward(
+      String delegator,
+      String validator,
+      [String fee = defaultFee,
+      String gas = defaultGas,
+      String memo = defaultMemo,
+      String gasAdjustment = defaultGasAdjustment]) async {
+    const rewardApi = "/distribution/delegators/rewards";
+    final reqData = {
+      "base_req": _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, delegator),
+      "delegator_acc": delegator,
+      "validator_acc": validator,
+    };
+
+    final msg = await _httpPost(url + rewardApi,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(reqData));
+
+    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, delegator);
+  }
+
+  /// construct SetWithdrawAddr Msg in JSON
+  /// 
+  /// [delegator] account ID of delegator
+  /// [withdrawAddr] new withdraw account of delegator
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [gasAdjustment] max gas consumption rate of a transaction can take
+  ///
+  /// Returns standard message of SetWithdrawAddr
+  Future<Map<String, dynamic>> newSetWithdrawAddr(
+      String delegator,
+      String withdrawAddr,
+      [String fee = defaultFee,
+      String gas = defaultGas,
+      String memo = defaultMemo,
+      String gasAdjustment = defaultGasAdjustment]) async {
+    const withdrawApi = "/distribution/delegators/withdraw_account";
+    final reqData = {
+      "base_req": _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, delegator),
+      "delegator_acc": delegator,
+      "withdraw_acc": withdrawAddr,
+    };
+
+    final msg = await _httpPost(url + withdrawApi,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(reqData));
+
+    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, delegator);
+  }
+
+  /// construct ValidatorReward Msg in JSON
+  /// 
+  /// [validator] account ID of validator
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [gasAdjustment] max gas consumption rate of a transaction can take
+  ///
+  /// Returns standard message of ValidatorReward
+  Future<Map<String, dynamic>> newValidatorReward(
+      String validator,
+      [String fee = defaultFee,
+      String gas = defaultGas,
+      String memo = defaultMemo,
+      String gasAdjustment = defaultGasAdjustment]) async {
+    const rewardApi = "/distribution/validators/rewards";
+    final reqData = {
+      "base_req": _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, validator),
+      "validator_acc": validator,
+    };
+
+    final msg = await _httpPost(url + rewardApi,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(reqData));
+
+    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, validator);
+  }
+
   /// post a signed transaction to blockchain
   ///
   /// [signedTx] signed transaction

@@ -62,5 +62,5 @@ dartfmt -w lib example
 pub publish --dry-run --verbose
 
 // Publish
-pub publish --verbose --server https://pub.dartlang.org
+flutter packages pub publish --verbose --server https://pub.dartlang.org
 ```
