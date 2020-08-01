@@ -1,3 +1,6 @@
+## Version 0.1.4 - 2020-08-01
+* Added some rpcs
+
 ## Version 0.1.3 - 2020-07-07
 * Added `getCoins` api
 

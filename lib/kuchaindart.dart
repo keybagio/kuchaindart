@@ -9,17 +9,20 @@ import 'package:pointycastle/ecc/curves/secp256k1.dart';
 import 'package:pointycastle/export.dart';
 import 'package:pointycastle/pointycastle.dart';
 
-import 'package:kuchaindart/utils/tx_signer.dart';
-import 'package:kuchaindart/json_rpc.dart';
-import './utils/bech32_encoder.dart';
+import 'json_rpc.dart';
+import 'utils/bech32_encoder.dart';
+import 'utils/tx_signer.dart';
 
 class Kuchain extends JsonRPC {
+  @override
   final String url;
+
+  @override
   final String chainId;
 
   // m/purpse'/coin_type'/account'/change/address_index
   String path = "m/44'/23808'/0'/0/0";
-  String bech32MainPrefix = "kuchain";
+  String bech32MainPrefix = 'kuchain';
 
   Kuchain({
     @required this.url,
@@ -45,11 +48,16 @@ class Kuchain extends JsonRPC {
     final words = child.identifier;
 
     // Bech32 encode
-    String address = Bech32Encoder.encode(bech32MainPrefix, words);
+    final address = Bech32Encoder.encode(bech32MainPrefix, words);
 
     return address;
   }
 
+  /// Get address from private key which in hex format
+  ///
+  /// [privateKeyHex] private key in hex format
+  ///
+  /// Returns the address derived from the private key
   String getAddressFromPrivateKeyHex(String privateKeyHex) {
     // Get the curve data
     final secp256k1 = ECCurve_secp256k1();
@@ -93,8 +101,8 @@ class Kuchain extends JsonRPC {
   ///
   /// Returns string pubkey in base64
   String getPubKeyBase64(Uint8List ecpairPriv) {
-    ECPrivateKey ecPrivateKey = _getECPrivateKey(ecpairPriv);
-    ECPublicKey ecPublicKey = _getECPublicKey(ecPrivateKey);
+    final ecPrivateKey = _getECPrivateKey(ecpairPriv);
+    final ecPublicKey = _getECPublicKey(ecPrivateKey);
     final pubKeyBase64 = base64.encode(ecPublicKey.Q.getEncoded(true));
     return pubKeyBase64;
   }
@@ -105,8 +113,8 @@ class Kuchain extends JsonRPC {
   ///
   /// Returns Uint8List pubkey
   Uint8List getPubKey(Uint8List ecpairPriv) {
-    ECPrivateKey ecPrivateKey = _getECPrivateKey(ecpairPriv);
-    ECPublicKey ecPublicKey = _getECPublicKey(ecPrivateKey);
+    final ecPrivateKey = _getECPrivateKey(ecpairPriv);
+    final ecPublicKey = _getECPublicKey(ecPrivateKey);
     return ecPublicKey.Q.getEncoded(true);
   }
 
@@ -116,7 +124,7 @@ class Kuchain extends JsonRPC {
     this.bech32MainPrefix = bech32MainPrefix;
 
     if (this.bech32MainPrefix == null || this.bech32MainPrefix.isEmpty) {
-      throw Exception("bech32MainPrefix object was not set or invalid");
+      throw Exception('bech32MainPrefix object was not set or invalid');
     }
   }
 
@@ -126,7 +134,7 @@ class Kuchain extends JsonRPC {
     this.path = path;
 
     if (this.path == null || this.path.isEmpty) {
-      throw Exception("path object was not set or invalid");
+      throw Exception('path object was not set or invalid');
     }
   }
 
@@ -139,7 +147,7 @@ class Kuchain extends JsonRPC {
   /// [modeType] broadcast type
   Future<Map<String, dynamic>> sign(
       Map<String, dynamic> stdSignMsg, Uint8List ecpairPriv,
-      [String modeType = "sync"]) async {
+      [String modeType = 'sync']) async {
     // Get standard sign message
     final rsp = await getStdSignMsg(stdSignMsg);
     var signMsg = jsonDecode(rsp.body);
@@ -151,8 +159,8 @@ class Kuchain extends JsonRPC {
     final hash = SHA256Digest().process(msgData);
 
     // Sign transaction
-    ECPrivateKey ecPrivateKey = _getECPrivateKey(ecpairPriv);
-    ECPublicKey ecPublicKey = _getECPublicKey(ecPrivateKey);
+    final ecPrivateKey = _getECPrivateKey(ecpairPriv);
+    final ecPublicKey = _getECPublicKey(ecPrivateKey);
 
     final signObj =
         TransactionSigner.deriveFrom(hash, ecPrivateKey, ecPublicKey);
@@ -160,35 +168,35 @@ class Kuchain extends JsonRPC {
     final signatureBase64 = base64Encode(signObj);
 
     return {
-      "tx": {
-        "msg": stdSignMsg['msg'],
-        "fee": stdSignMsg['fee'],
-        "signatures": [
+      'tx': {
+        'msg': stdSignMsg['msg'],
+        'fee': stdSignMsg['fee'],
+        'signatures': [
           {
-            "signature": signatureBase64,
-            "pub_key": {
-              "type": "tendermint/PubKeySecp256k1",
-              "value": getPubKeyBase64(ecpairPriv)
+            'signature': signatureBase64,
+            'pub_key': {
+              'type': 'tendermint/PubKeySecp256k1',
+              'value': getPubKeyBase64(ecpairPriv)
             }
           }
         ],
-        "memo": stdSignMsg['memo']
+        'memo': stdSignMsg['memo']
       },
-      "mode": modeType
+      'mode': modeType
     };
   }
 
-  /// Returns the associated [privateKey] as an [ECPrivateKey] instance.
+  /// Returns the associated private key as an [ECPrivateKey] instance.
   ECPrivateKey _getECPrivateKey(Uint8List privateKey) {
     final privateKeyInt = BigInt.parse(HEX.encode(privateKey), radix: 16);
     return ECPrivateKey(privateKeyInt, ECCurve_secp256k1());
   }
 
-  /// Returns the associated [publicKey] as an [ECPublicKey] instance.
-  ECPublicKey _getECPublicKey(ECPrivateKey _ecPrivateKey) {
+  /// Returns the associated public key from the [ecPrivateKey].
+  ECPublicKey _getECPublicKey(ECPrivateKey ecPrivateKey) {
     final secp256k1 = ECCurve_secp256k1();
     final point = secp256k1.G;
-    final curvePoint = point * _ecPrivateKey.d;
+    final curvePoint = point * ecPrivateKey.d;
     return ECPublicKey(curvePoint, ECCurve_secp256k1());
   }
 }

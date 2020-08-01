@@ -55,6 +55,9 @@ This library is simple and easy to use. We don't have any formal documentation y
 
 ## Script
 ```
+// Analyze code
+flutter analyze
+
 // Format code
 dartfmt -w lib example
 
