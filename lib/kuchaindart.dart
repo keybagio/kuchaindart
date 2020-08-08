@@ -3,31 +3,29 @@ import 'dart:typed_data';
 import 'package:bip32/bip32.dart' as bip32;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:hex/hex.dart';
-import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:pointycastle/ecc/curves/secp256k1.dart';
 import 'package:pointycastle/export.dart';
 import 'package:pointycastle/pointycastle.dart';
-
+import 'package:http/http.dart';
 import 'json_rpc.dart';
 import 'utils/bech32_encoder.dart';
 import 'utils/tx_signer.dart';
 
-class Kuchain extends JsonRPC {
-  @override
+class Kuchain with JsonRPC {
   final String url;
-
-  @override
   final String chainId;
+  final Client client = Client();
 
   // m/purpse'/coin_type'/account'/change/address_index
   String path = "m/44'/23808'/0'/0/0";
   String bech32MainPrefix = 'kuchain';
-
+  String mainCoinDenom = 'kuchain/kcs';
+  
   Kuchain({
     @required this.url,
     @required this.chainId,
-  }) : super(url: url, chainId: chainId, client: http.Client());
+  });
 
   /// Get address from a mnemonic
   ///
@@ -138,6 +136,16 @@ class Kuchain extends JsonRPC {
     }
   }
 
+  /// Set mainCoinDenom
+  /// [mainCoinDenom] mainCoinDenom - main coin denom
+  void setMainCoinDenom(String mainCoinDenom) {
+    this.mainCoinDenom = mainCoinDenom;
+
+    if (this.mainCoinDenom == null || this.mainCoinDenom.isEmpty) {
+      throw Exception('mainCoinDenom object was not set or invalid');
+    }
+  }
+
   /// sign a transaction with stdMsg and private key
   ///
   /// [stdSignMsg] standard object of a message
@@ -150,7 +158,11 @@ class Kuchain extends JsonRPC {
       [String modeType = 'sync']) async {
     // Get standard sign message
     final rsp = await getStdSignMsg(stdSignMsg);
-    var signMsg = jsonDecode(rsp.body);
+    var signMsg = json.decode(rsp.body);
+
+    if (signMsg["error"] != null && signMsg["error"].isNotEmpty) {
+      throw Exception("Get SignMsg From Cli Error: " + json.encode(signMsg));
+    }
 
     // Decode message as base64
     final msgData = base64Decode(signMsg['msg'] as String);

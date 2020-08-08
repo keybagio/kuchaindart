@@ -7,16 +7,27 @@ const defaultMemo = 'send via kuchain';
 const defaultFee = '100';
 const defaultGas = '200000';
 const defaultGasAdjustment = '1.2';
-const defaultCoin = 'kuchain/kcs';
 const nameStrLenMax = 17;
 
 class JsonRPC {
-  final String url;
-  final String chainId;
-  final Client client;
+  String url;
+  String chainId;
+  String mainCoinDenom;
+  Client client;
 
-  JsonRPC({@required this.url, @required this.chainId, @required this.client});
+  void config({
+    @required String url, 
+    @required String chainId, 
+    String mainCoinDenom = 'kuchain/kcs', 
+    Client client,
+  }) {
+    this.url = url;
+    this.chainId = chainId;
+    this.mainCoinDenom = mainCoinDenom;
+    this.client = client != null ? client : Client();
+  }
 
+  /// get standard sign message
   Future<Response> getStdSignMsg(
     Map<String, dynamic> msg,
   ) async {
@@ -734,7 +745,7 @@ class JsonRPC {
       'gas_adjustment': gasAdjustment,
       'payer': payer,
       'fees': [
-        {'denom': defaultCoin, 'amount': fee}
+        {'denom': mainCoinDenom, 'amount': fee}
       ],
     };
   }
@@ -753,14 +764,25 @@ class JsonRPC {
   /// Return sorted Msg
   Future<Map<String, dynamic>> _sortMsg(
       Map<String, dynamic> msg, String sender) async {
+    if (msg['error'] != null && msg['error'].isNotEmpty) {
+      throw Exception('Get Msg From Cli Error: ' + json.encode(msg));
+    }
+
     Map<String, dynamic> acc, auth;
 
     if (sender.length <= nameStrLenMax) {
       acc = await getAccount(sender);
-      auth = await getAuth(
-          acc['result']['value']['auths'][0]['address'] as String);
-    } else {
-      auth = await getAuth(sender);
+      if (acc['error'] != null && acc['error'].isNotEmpty) {
+        throw Exception('Get Account Info Error: ' + json.encode(acc));
+      }
+
+      sender = acc['result']['value']['auths'][0]['address'] as String;
+    }
+
+    auth = await getAuth(sender);
+
+    if (auth['error'] != null && auth['error'].isNotEmpty) {
+      throw Exception('Get Auth Info Error: ' + json.encode(auth));
     }
 
     return {
@@ -774,13 +796,13 @@ class JsonRPC {
   }
 
   Future<Response> _httpGet(url, {Map<String, String> headers}) async {
-    // print('_httpGet url ================');
-    // print(url);
+    print('_httpGet url ================');
+    print(url);
 
     final response = await client.get(url, headers: headers);
 
-    // print('_httpGet response================');
-    // print(response.body);
+    print('_httpGet response================');
+    print(response.body);
     return response;
   }
 
