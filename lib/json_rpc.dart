@@ -24,7 +24,7 @@ class JsonRPC {
     this.url = url;
     this.chainId = chainId;
     this.mainCoinDenom = mainCoinDenom;
-    this.client = client != null ? client : Client();
+    this.client = client ?? Client();
   }
 
   /// get standard sign message
@@ -764,16 +764,16 @@ class JsonRPC {
   /// Return sorted Msg
   Future<Map<String, dynamic>> _sortMsg(
       Map<String, dynamic> msg, String sender) async {
-    if (msg['error'] != null && msg['error'].isNotEmpty) {
-      throw Exception('Get Msg From Cli Error: ' + json.encode(msg));
+    if (msg['error'] != null && (msg['error'] as String).isNotEmpty) {
+      throw Exception('Get Msg From Cli Error: ${json.encode(msg)}');
     }
 
     Map<String, dynamic> acc, auth;
 
     if (sender.length <= nameStrLenMax) {
       acc = await getAccount(sender);
-      if (acc['error'] != null && acc['error'].isNotEmpty) {
-        throw Exception('Get Account Info Error: ' + json.encode(acc));
+      if (acc['error'] != null && (acc['error'] as String).isNotEmpty) {
+        throw Exception('Get Account Info Error: ${json.encode(acc)}');
       }
 
       sender = acc['result']['value']['auths'][0]['address'] as String;
@@ -781,8 +781,8 @@ class JsonRPC {
 
     auth = await getAuth(sender);
 
-    if (auth['error'] != null && auth['error'].isNotEmpty) {
-      throw Exception('Get Auth Info Error: ' + json.encode(auth));
+    if (auth['error'] != null && (auth['error'] as String).isNotEmpty) {
+      throw Exception('Get Auth Info Error:  ${json.encode(auth)}');
     }
 
     return {

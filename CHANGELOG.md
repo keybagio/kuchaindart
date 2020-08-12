@@ -1,3 +1,7 @@
+## Version 0.1.5 - 2020-08-12
+* Refactor code with mixin
+* Fixed rpc newDelegationMsg
+
 ## Version 0.1.4 - 2020-08-01
 * Added some rpcs
 

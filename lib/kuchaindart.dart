@@ -13,13 +13,17 @@ import 'utils/bech32_encoder.dart';
 import 'utils/tx_signer.dart';
 
 class Kuchain with JsonRPC {
+  @override
   final String url;
+  @override
   final String chainId;
+  @override
   final Client client = Client();
 
   // m/purpse'/coin_type'/account'/change/address_index
   String path = "m/44'/23808'/0'/0/0";
   String bech32MainPrefix = 'kuchain';
+  @override
   String mainCoinDenom = 'kuchain/kcs';
   
   Kuchain({
@@ -160,8 +164,8 @@ class Kuchain with JsonRPC {
     final rsp = await getStdSignMsg(stdSignMsg);
     var signMsg = json.decode(rsp.body);
 
-    if (signMsg["error"] != null && signMsg["error"].isNotEmpty) {
-      throw Exception("Get SignMsg From Cli Error: " + json.encode(signMsg));
+    if (signMsg['error'] != null && (signMsg['error'] as String).isNotEmpty) {
+      throw Exception('Get SignMsg From Cli Error: ${json.encode(signMsg)}');
     }
 
     // Decode message as base64
