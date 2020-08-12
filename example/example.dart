@@ -37,7 +37,7 @@ Future main() async {
   print(address);
 
   // Configure your own information
-  const myAccount = 'test1';
+  const myAccount = 'testaccount1';
   final myAddress = address;
 
   const myPrivatKeyHex =
@@ -85,7 +85,7 @@ Future main() async {
   // ====================================
   // final newCreateAccMsg = await kuchain.newCreateAccMsg(
   //   myAddress,
-  //   'test2',
+  //   myAccount,
   //   myAddress,
   // );
   // print('\n newCreateAccMsg ======================');
@@ -104,8 +104,8 @@ Future main() async {
   // ====================================
   final newTransferMsg = await kuchain.newTransferMsg(
     myAddress,
-    'test1',
-    '10000' + mainCoinDenom,
+    myAccount,
+    '10000$mainCoinDenom',
   );
   print('\n newTransferMsg ======================');
   print(json.encode(newTransferMsg));

@@ -372,7 +372,7 @@ class JsonRPC {
       String gas = defaultGas,
       String memo = defaultMemo,
       String gasAdjustment = defaultGasAdjustment]) async {
-    const delegationApi = '/assets/delegations';
+    const delegationApi = '/staking/delegations';
     final reqData = {
       'base_req':
           _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, delegator),
