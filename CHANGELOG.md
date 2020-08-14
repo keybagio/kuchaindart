@@ -1,3 +1,6 @@
+## Version 0.1.6 - 2020-08-14
+* Fixed rpc newValidatorReward
+
 ## Version 0.1.5 - 2020-08-12
 * Refactor code with mixin
 * Fixed rpc newDelegationMsg

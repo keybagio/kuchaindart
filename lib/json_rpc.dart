@@ -16,9 +16,9 @@ class JsonRPC {
   Client client;
 
   void config({
-    @required String url, 
-    @required String chainId, 
-    String mainCoinDenom = 'kuchain/kcs', 
+    @required String url,
+    @required String chainId,
+    String mainCoinDenom = 'kuchain/kcs',
     Client client,
   }) {
     this.url = url;
@@ -647,7 +647,7 @@ class JsonRPC {
       String gas = defaultGas,
       String memo = defaultMemo,
       String gasAdjustment = defaultGasAdjustment]) async {
-    const rewardApi = '/distribution/delegators/rewards';
+    const rewardApi = '/distribution/delegators_validator/rewards';
     final reqData = {
       'base_req':
           _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, delegator),

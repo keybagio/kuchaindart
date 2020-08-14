@@ -12,7 +12,7 @@ Future main() async {
   // const chainId = 'kuchain';
   // const prefix = 'kuchain';
   // const mainCoinDenom = 'kuchain/kcs';
-  
+
   const chainId = 'kratos';
   const prefix = 'kratos'; // Test network
   const mainCoinDenom = 'kratos/kts'; // Test network

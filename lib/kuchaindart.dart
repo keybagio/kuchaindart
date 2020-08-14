@@ -25,7 +25,7 @@ class Kuchain with JsonRPC {
   String bech32MainPrefix = 'kuchain';
   @override
   String mainCoinDenom = 'kuchain/kcs';
-  
+
   Kuchain({
     @required this.url,
     @required this.chainId,
