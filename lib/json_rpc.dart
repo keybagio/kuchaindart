@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
+import 'query_rpc.dart';
 
 const defaultMemo = 'send via kuchain';
 const defaultFee = '100';
@@ -14,17 +15,25 @@ class JsonRPC {
   String chainId;
   String mainCoinDenom;
   Client client;
+  QueryRPC queryRPC;
 
   void config({
     @required String url,
     @required String chainId,
     String mainCoinDenom = 'kuchain/kcs',
     Client client,
+    QueryRPC queryRPC,
   }) {
     this.url = url;
     this.chainId = chainId;
     this.mainCoinDenom = mainCoinDenom;
     this.client = client ?? Client();
+    this.queryRPC = queryRPC ?? QueryRPC();
+
+    this.queryRPC.config(
+          url: this.url,
+          client: this.client,
+        );
   }
 
   /// get standard sign message
@@ -38,81 +47,6 @@ class JsonRPC {
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(msg),
     );
-  }
-
-  /// get account info from `account`
-  ///
-  /// [account] account ID of kuchain
-  ///
-  /// Returns account infos in JSON
-  Future<Map<String, dynamic>> getAccount(
-    String account,
-  ) async {
-    const accountsApi = '/account/';
-
-    return _httpGet(
-      url + accountsApi + account,
-    ).then((response) => json.decode(response.body) as Map<String, dynamic>);
-  }
-
-  /// get accounts info from `address`
-  ///
-  /// [address] address of kuchain
-  ///
-  /// Returns accounts in JSON
-  Future<Map<String, dynamic>> getAccounts(
-    String address,
-  ) async {
-    const accountsApi = '/accounts/';
-
-    return _httpGet(
-      url + accountsApi + address,
-    ).then((response) => json.decode(response.body) as Map<String, dynamic>);
-  }
-
-  /// get auth info from `auth`
-  ///
-  /// [auth] auth(address) of an account in kuchain
-  ///
-  /// Returns auth infos in JSON
-  Future<Map<String, dynamic>> getAuth(
-    String auth,
-  ) async {
-    const authApi = '/account/auth/';
-
-    return _httpGet(
-      url + authApi + auth,
-    ).then((response) => json.decode(response.body) as Map<String, dynamic>);
-  }
-
-  /// get coins info from `account` or `address`
-  ///
-  /// [account] account or address of kuchain
-  ///
-  /// Returns coins infos in JSON
-  Future<Map<String, dynamic>> getCoins(
-    String account,
-  ) async {
-    const coinsApi = '/assets/coins/';
-
-    return _httpGet(
-      url + coinsApi + account,
-    ).then((response) => json.decode(response.body) as Map<String, dynamic>);
-  }
-
-  /// get txs info from `hash`
-  ///
-  /// [hash] Tx hash
-  ///
-  /// Returns txs infos in JSON
-  Future<Map<String, dynamic>> getTxs(
-    String hash,
-  ) async {
-    const txsApi = '/txs/';
-
-    return _httpGet(
-      url + txsApi + hash,
-    ).then((response) => json.decode(response.body) as Map<String, dynamic>);
   }
 
   /// get CreateAccount Msg in JSON
@@ -771,7 +705,7 @@ class JsonRPC {
     Map<String, dynamic> acc, auth;
 
     if (sender.length <= nameStrLenMax) {
-      acc = await getAccount(sender);
+      acc = await queryRPC.getAccountInfo(sender);
       if (acc['error'] != null && (acc['error'] as String).isNotEmpty) {
         throw Exception('Get Account Info Error: ${json.encode(acc)}');
       }
@@ -779,7 +713,7 @@ class JsonRPC {
       sender = acc['result']['value']['auths'][0]['address'] as String;
     }
 
-    auth = await getAuth(sender);
+    auth = await queryRPC.getAuthInfo(sender);
 
     if (auth['error'] != null && (auth['error'] as String).isNotEmpty) {
       throw Exception('Get Auth Info Error:  ${json.encode(auth)}');
@@ -793,17 +727,6 @@ class JsonRPC {
       'fee': msg['value']['fee'],
       'memo': msg['value']['memo']
     };
-  }
-
-  Future<Response> _httpGet(url, {Map<String, String> headers}) async {
-    print('_httpGet url ================');
-    print(url);
-
-    final response = await client.get(url, headers: headers);
-
-    print('_httpGet response================');
-    print(response.body);
-    return response;
   }
 
   Future<Response> _httpPost(url,

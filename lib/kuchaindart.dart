@@ -9,16 +9,19 @@ import 'package:pointycastle/export.dart';
 import 'package:pointycastle/pointycastle.dart';
 import 'package:http/http.dart';
 import 'json_rpc.dart';
+import 'query_rpc.dart';
 import 'utils/bech32_encoder.dart';
 import 'utils/tx_signer.dart';
 
-class Kuchain with JsonRPC {
+class Kuchain with QueryRPC, JsonRPC {
   @override
   final String url;
   @override
   final String chainId;
   @override
   final Client client = Client();
+  @override
+  final QueryRPC queryRPC = QueryRPC();
 
   // m/purpse'/coin_type'/account'/change/address_index
   String path = "m/44'/23808'/0'/0/0";
@@ -29,7 +32,12 @@ class Kuchain with JsonRPC {
   Kuchain({
     @required this.url,
     @required this.chainId,
-  });
+  }) {
+    queryRPC.config(
+      url: url,
+      client: client,
+    );
+  }
 
   /// Get address from a mnemonic
   ///

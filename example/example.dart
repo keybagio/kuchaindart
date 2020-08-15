@@ -4,18 +4,22 @@ import 'package:hex/hex.dart';
 import 'package:kuchaindart/kuchaindart.dart';
 
 Future main() async {
-  print('main start');
-
   // const url = 'http://127.0.0.1:1317';
   const url = 'http://121.89.216.155';
 
+  // ====================================
+  //           Formal network
+  // ====================================
   // const chainId = 'kuchain';
   // const prefix = 'kuchain';
   // const mainCoinDenom = 'kuchain/kcs';
 
+  // ====================================
+  //           Test network
+  // ====================================
   const chainId = 'kratos';
-  const prefix = 'kratos'; // Test network
-  const mainCoinDenom = 'kratos/kts'; // Test network
+  const prefix = 'kratos';
+  const mainCoinDenom = 'kratos/kts';
 
   var kuchain = Kuchain(
     url: url,
@@ -60,17 +64,31 @@ Future main() async {
   print(getPubKey);
 
   // ====================================
+  //          Get node info
+  // ====================================
+  final nodeInfo = await kuchain.getNodeInfo();
+  print('\n getNodeInfo ======================');
+  print(nodeInfo);
+
+  // ====================================
+  //          Get block info
+  // ====================================
+  final blockLatest = await kuchain.getBlocks();
+  print('\n getBlocks ======================');
+  print(blockLatest);
+
+  // ====================================
   //          Get accounts info from address
   // ====================================
-  final accounts = await kuchain.getAccounts(myAddress);
-  print('\n getAccounts ======================');
+  final accounts = await kuchain.getAccountsByAuth(myAddress);
+  print('\n getAccountsByAuth ======================');
   print(accounts);
 
   // ====================================
   //          Get account info
   // ====================================
-  final accountInfo = await kuchain.getAccount(myAccount);
-  print('\n getAccount ======================');
+  final accountInfo = await kuchain.getAccountInfo(myAccount);
+  print('\n getAccountInfo ======================');
   print(accountInfo);
 
   // ====================================
@@ -84,9 +102,10 @@ Future main() async {
   //            Create account
   // ====================================
   // final newCreateAccMsg = await kuchain.newCreateAccMsg(
-  //   myAddress,
   //   myAccount,
+  //   'testaccount3',
   //   myAddress,
+  //   '2000',
   // );
   // print('\n newCreateAccMsg ======================');
   // print(newCreateAccMsg);
@@ -105,7 +124,8 @@ Future main() async {
   final newTransferMsg = await kuchain.newTransferMsg(
     myAddress,
     myAccount,
-    '10000$mainCoinDenom',
+    '100$mainCoinDenom',
+    '2000',
   );
   print('\n newTransferMsg ======================');
   print(json.encode(newTransferMsg));

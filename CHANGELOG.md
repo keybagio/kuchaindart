@@ -1,3 +1,6 @@
+## Version 0.1.7 - 2020-08-16
+* Added some query rpcs
+
 ## Version 0.1.6 - 2020-08-14
 * Fixed rpc newValidatorReward
 
