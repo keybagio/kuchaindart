@@ -246,6 +246,13 @@ class QueryRPC {
     return _httpGetAndDecode('/gov/proposals/$proposalId');
   }
 
+  /// Get proposal’s proposer by proposal id
+  ///
+  /// [proposalId] proposal id
+  Future<Map<String, dynamic>> getProposalProposer(String proposalId) {
+    return _httpGetAndDecode('/gov/proposals/$proposalId/proposer');
+  }
+
   /// Get proposal's tally by proposal id
   ///
   /// [proposalId] proposal id

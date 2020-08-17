@@ -412,8 +412,8 @@ class JsonRPC {
     final reqData = {
       'base_req':
           _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, proposer),
-      title: title,
-      description: description,
+      'title': title,
+      'description': description,
       'initial_deposit': initialDeposit,
       'proposer_acc': proposer
     };
@@ -456,8 +456,8 @@ class JsonRPC {
     final reqData = {
       'base_req':
           _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, proposer),
-      title: title,
-      description: description,
+      'title': title,
+      'description': description,
       'initial_deposit': initialDeposit,
       'proposer_acc': proposer,
       'param_changes': [
@@ -494,8 +494,8 @@ class JsonRPC {
       'base_req':
           _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, depositor),
       'proposal_id': proposalId,
-      depositor: depositor,
-      amount: amount,
+      'depositor': depositor,
+      'amount': amount,
     };
 
     final msg = await _httpPost(url + proposalApi,
@@ -526,8 +526,8 @@ class JsonRPC {
     final reqData = {
       'base_req': _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, voter),
       'proposal_id': proposalId,
-      voter: voter,
-      option: option,
+      'voter': voter,
+      'option': option,
     };
 
     final msg = await _httpPost(url + voteApi,

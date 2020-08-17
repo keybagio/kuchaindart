@@ -101,41 +101,63 @@ Future main() async {
   // ====================================
   //            Create account
   // ====================================
-  // final newCreateAccMsg = await kuchain.newCreateAccMsg(
-  //   myAccount,
-  //   'testaccount3',
-  //   myAddress,
-  //   '2000',
-  // );
-  // print('\n newCreateAccMsg ======================');
-  // print(newCreateAccMsg);
+  final newCreateAccMsg = await kuchain.newCreateAccMsg(
+    myAccount,
+    'testaccount4',
+    myAddress,
+    '2000',
+  );
+  print('\n newCreateAccMsg ======================');
+  print(newCreateAccMsg);
 
-  // final signedCreateAccMsgTx = await kuchain.sign(newCreateAccMsg, ecpairPriv);
-  // print('\n signedCreateAccMsgTx ======================');
-  // print(signedCreateAccMsgTx);
+  final signedCreateAccMsgTx = await kuchain.sign(newCreateAccMsg, ecpairPriv);
+  print('\n signedCreateAccMsgTx ======================');
+  print(signedCreateAccMsgTx);
 
-  // final createAccRes = await kuchain.broadcast(signedCreateAccMsgTx);
-  // print('\n createAccRes ======================');
-  // print(createAccRes);
+  final createAccRes = await kuchain.broadcast(signedCreateAccMsgTx);
+  print('\n createAccRes ======================');
+  print(createAccRes);
 
   // ====================================
   //              Transfer
   // ====================================
-  final newTransferMsg = await kuchain.newTransferMsg(
-    myAddress,
-    myAccount,
-    '100$mainCoinDenom',
-    '2000',
-  );
-  print('\n newTransferMsg ======================');
-  print(json.encode(newTransferMsg));
+  // final newTransferMsg = await kuchain.newTransferMsg(
+  //   myAddress,
+  //   myAccount,
+  //   '1000000000000000000$mainCoinDenom',
+  //   '2000',
+  // );
+  // final signedTransferMsgTx = await kuchain.sign(newTransferMsg, ecpairPriv);
+  // final transferRes = await kuchain.broadcast(signedTransferMsgTx);
+  // print('\n transferRes ======================');
+  // print(transferRes);
 
-  final signedNewTransferMsgTx = await kuchain.sign(newTransferMsg, ecpairPriv);
-  print('\n signedNewTransferMsgTx ======================');
-  print(signedNewTransferMsgTx);
-  print(json.encode(signedNewTransferMsgTx));
+  // ====================================
+  //              Staking
+  // ====================================
+  // final newDelegationMsg = await kuchain.newDelegationMsg(
+  //   myAccount,
+  //   'michael', // validator
+  //   '100$mainCoinDenom',
+  //   '2000',
+  // );
+  // final signedDelegationMsgTx = await kuchain.sign(newDelegationMsg, ecpairPriv);
+  // final delegationRes = await kuchain.broadcast(signedDelegationMsgTx);
+  // print('\n delegationRes ======================');
+  // print(delegationRes);
 
-  final transferRes = await kuchain.broadcast(signedNewTransferMsgTx);
-  print('\n transferRes ======================');
-  print(transferRes);
+  // ====================================
+  //              Proposal
+  // ====================================
+  // final newProposalMsg = await kuchain.newProposalMsg(
+  //   'Proposal Title',
+  //   'Proposal description',
+  //   '500000000000000000000$mainCoinDenom',
+  //   myAccount,
+  //   '2000',
+  // );
+  // final signedProposalMsgTx = await kuchain.sign(newProposalMsg, ecpairPriv);
+  // final proposalMsg = await kuchain.broadcast(signedProposalMsgTx);
+  // print('\n proposalMsg ======================');
+  // print(proposalMsg);
 }

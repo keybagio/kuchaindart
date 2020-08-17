@@ -1,3 +1,6 @@
+## Version 0.1.8 - 2020-08-17
+* Fixed some rpc bugs
+
 ## Version 0.1.7 - 2020-08-16
 * Added some query rpcs
 
