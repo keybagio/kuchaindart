@@ -45,7 +45,7 @@ class JsonRPC {
     return _httpPost(
       url + encodeApi,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(msg),
+      body: json.encode(msg),
     );
   }
 

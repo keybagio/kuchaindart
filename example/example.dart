@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:hex/hex.dart';
 import 'package:kuchaindart/kuchaindart.dart';
