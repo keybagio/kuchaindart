@@ -5,7 +5,7 @@ import 'package:meta/meta.dart';
 import 'query_rpc.dart';
 
 const defaultMemo = 'send via kuchain';
-const defaultFee = '100';
+const defaultFee = '2000';
 const defaultGas = '200000';
 const defaultGasAdjustment = '1.2';
 const nameStrLenMax = 17;
@@ -73,11 +73,7 @@ class JsonRPC {
       'account_auth': accAuth
     };
 
-    final msg = await _httpPost(url + createAccApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
-
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, creator);
+    return fetchMsg(url + createAccApi, reqData);
   }
 
   /// construct UpdateAuthMsg Msg in JSON
@@ -102,11 +98,7 @@ class JsonRPC {
       'new_account_auth': newAccountAuth,
     };
 
-    final msg = await _httpPost(url + updateApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
-
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, account);
+    return fetchMsg(url + updateApi, reqData);
   }
 
   /// construct TransferMsg Msg in JSON
@@ -139,11 +131,7 @@ class JsonRPC {
       'amount': amount,
     };
 
-    final msg = await _httpPost(url + transferApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
-
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, from);
+    return fetchMsg(url + transferApi, reqData);
   }
 
   /// construct CreateCoin Msg in JSON
@@ -189,11 +177,7 @@ class JsonRPC {
       'desc': desc,
     };
 
-    final msg = await _httpPost(url + createApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
-
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, creator);
+    return fetchMsg(url + createApi, reqData);
   }
 
   /// construct IssueCoin Msg in JSON
@@ -221,11 +205,7 @@ class JsonRPC {
       'amount': amount,
     };
 
-    final msg = await _httpPost(url + issueApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
-
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, creator);
+    return fetchMsg(url + issueApi, reqData);
   }
 
   /// construct LockCoin Msg in JSON
@@ -253,11 +233,7 @@ class JsonRPC {
       'amount': amount,
     };
 
-    final msg = await _httpPost(url + lockApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
-
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, account);
+    return fetchMsg(url + lockApi, reqData);
   }
 
   /// construct UnlockCoin Msg in JSON
@@ -282,11 +258,32 @@ class JsonRPC {
       'amount': amount,
     };
 
-    final msg = await _httpPost(url + unlockApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
+    return fetchMsg(url + unlockApi, reqData);
+  }
 
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, account);
+  /// construct BurnCoin Msg in JSON
+  ///
+  /// [account] account ID of burning coin
+  /// [amount] amount of coin to be issued
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [gasAdjustment] max gas consumption rate of a transaction can take
+  ///
+  /// Returns standard message of BurnCoin
+  Future<Map<String, dynamic>> newBurnCoinMsg(String account, String amount,
+      [String fee = defaultFee,
+      String gas = defaultGas,
+      String memo = defaultMemo,
+      String gasAdjustment = defaultGasAdjustment]) async {
+    const burnApi = '/assets/burn';
+    final reqData = {
+      'base_req': _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, account),
+      'account': account,
+      'amount': amount,
+    };
+
+    return fetchMsg(url + burnApi, reqData);
   }
 
   /// construct Delegation Msg in JSON
@@ -315,11 +312,7 @@ class JsonRPC {
       'amount': amount,
     };
 
-    final msg = await _httpPost(url + delegationApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
-
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, delegator);
+    return fetchMsg(url + delegationApi, reqData);
   }
 
   /// construct Unbonding Msg in JSON
@@ -348,11 +341,7 @@ class JsonRPC {
       'amount': amount,
     };
 
-    final msg = await _httpPost(url + delegationApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
-
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, delegator);
+    return fetchMsg(url + delegationApi, reqData);
   }
 
   /// construct Redelegation Msg in JSON
@@ -383,11 +372,7 @@ class JsonRPC {
       'amount': amount
     };
 
-    final msg = await _httpPost(url + delegationApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
-
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, delegator);
+    return fetchMsg(url + delegationApi, reqData);
   }
 
   /// construct Proposal Msg in JSON
@@ -418,11 +403,7 @@ class JsonRPC {
       'proposer_acc': proposer
     };
 
-    final msg = await _httpPost(url + proposalApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
-
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, proposer);
+    return fetchMsg(url + proposalApi, reqData);
   }
 
   /// construct ProposalParamChange Msg in JSON
@@ -461,15 +442,11 @@ class JsonRPC {
       'initial_deposit': initialDeposit,
       'proposer_acc': proposer,
       'param_changes': [
-        {subspace: subspace, key: key, value: value}
+        {'subspace': subspace, 'key': key, 'value': value}
       ]
     };
 
-    final msg = await _httpPost(url + proposalApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
-
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, proposer);
+    return fetchMsg(url + proposalApi, reqData);
   }
 
   /// construct Deposit Msg in JSON
@@ -489,7 +466,7 @@ class JsonRPC {
       String gas = defaultGas,
       String memo = defaultMemo,
       String gasAdjustment = defaultGasAdjustment]) async {
-    const proposalApi = '/gov/deposits';
+    const depositsApi = '/gov/deposits';
     final reqData = {
       'base_req':
           _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, depositor),
@@ -498,11 +475,7 @@ class JsonRPC {
       'amount': amount,
     };
 
-    final msg = await _httpPost(url + proposalApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
-
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, depositor);
+    return fetchMsg(url + depositsApi, reqData);
   }
 
   /// construct Vote Msg in JSON
@@ -530,11 +503,7 @@ class JsonRPC {
       'option': option,
     };
 
-    final msg = await _httpPost(url + voteApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
-
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, voter);
+    return fetchMsg(url + voteApi, reqData);
   }
 
   /// construct DelegatorReward Msg in JSON
@@ -558,11 +527,7 @@ class JsonRPC {
       'delegator_acc': delegator,
     };
 
-    final msg = await _httpPost(url + rewardApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
-
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, delegator);
+    return fetchMsg(url + rewardApi, reqData);
   }
 
   /// construct DelegatorValidatorReward Msg in JSON
@@ -589,11 +554,7 @@ class JsonRPC {
       'validator_acc': validator,
     };
 
-    final msg = await _httpPost(url + rewardApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
-
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, delegator);
+    return fetchMsg(url + rewardApi, reqData);
   }
 
   /// construct SetWithdrawAddr Msg in JSON
@@ -620,11 +581,7 @@ class JsonRPC {
       'withdraw_acc': withdrawAddr,
     };
 
-    final msg = await _httpPost(url + withdrawApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
-
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, delegator);
+    return fetchMsg(url + withdrawApi, reqData);
   }
 
   /// construct ValidatorReward Msg in JSON
@@ -648,11 +605,16 @@ class JsonRPC {
       'validator_acc': validator,
     };
 
-    final msg = await _httpPost(url + rewardApi,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(reqData));
+    return fetchMsg(url + rewardApi, reqData);
+  }
 
-    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>, validator);
+  Future queryFee(Map<String, dynamic> stdSignMsg) {
+    final queryFeeApi = '/txs/fee';
+
+    return _httpPost(url + queryFeeApi,
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode(stdSignMsg))
+        .then((response) => json.decode(response.body));
   }
 
   /// post a signed transaction to blockchain
@@ -702,6 +664,62 @@ class JsonRPC {
       throw Exception('Get Msg From Cli Error: ${json.encode(msg)}');
     }
 
+    final auth = await _sortAuth(sender);
+
+    return {
+      'chain_id': chainId,
+      'account_number': auth['result']['number'],
+      'sequence': auth['result']['sequence'],
+      'msg': msg['value']['msg'],
+      'fee': msg['value']['fee'],
+      'memo': msg['value']['memo']
+    };
+  }
+
+  /// Sort MultiMsg
+  ///
+  /// [sender] transaction sender
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [msgs] Msg which to sort
+  ///
+  /// Return sorted Msg
+  Future<Map<String, dynamic>> sortMultiMsg(
+    String sender,
+    String fee,
+    String gas,
+    String memo,
+    List msgs,
+  ) async {
+    final finalMsgs = [];
+
+    for (var i = 0, len = msgs.length; i < len; i++) {
+      if (msgs[i]['error'] != null && (msgs[i]['error'] as String).isNotEmpty) {
+        throw Exception('Get Msg From Cli Error: ${json.encode(msgs[i])}');
+      }
+      finalMsgs.add(msgs[i].msg[0]);
+    }
+
+    final auth = await _sortAuth(sender);
+
+    return {
+      'chain_id': chainId,
+      'account_number': auth['result']['number'],
+      'sequence': auth['result']['sequence'],
+      'msg': finalMsgs,
+      'fee': {
+        'amount': [
+          {'denom': mainCoinDenom, 'amount': fee}
+        ],
+        'gas': gas,
+        'payer': sender
+      },
+      'memo': memo
+    };
+  }
+
+  Future<Map<String, dynamic>> _sortAuth(String sender) async {
     Map<String, dynamic> acc, auth;
 
     if (sender.length <= nameStrLenMax) {
@@ -719,14 +737,15 @@ class JsonRPC {
       throw Exception('Get Auth Info Error:  ${json.encode(auth)}');
     }
 
-    return {
-      'chain_id': chainId,
-      'account_number': auth['result']['number'],
-      'sequence': auth['result']['sequence'],
-      'msg': msg['value']['msg'],
-      'fee': msg['value']['fee'],
-      'memo': msg['value']['memo']
-    };
+    return auth;
+  }
+
+  Future<Map<String, dynamic>> fetchMsg(String msgPath, dynamic req) async {
+    final msg = await _httpPost(msgPath,
+        headers: {'Content-Type': 'application/json'}, body: json.encode(req));
+
+    return _sortMsg(json.decode(msg.body) as Map<String, dynamic>,
+        req.base_req.payer as String);
   }
 
   Future<Response> _httpPost(url,

@@ -1,3 +1,7 @@
+## Version 0.1.9 - 2020-09-14
+* Add importPriKeyBase64 / exportPriKeyBase64 rpc
+* Fixed newProposalParamMsg rpc bug
+
 ## Version 0.1.8 - 2020-08-17
 * Fixed some rpc bugs
 

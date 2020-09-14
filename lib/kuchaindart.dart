@@ -63,6 +63,20 @@ class Kuchain with QueryRPC, JsonRPC {
     return address;
   }
 
+  /// Get address from private key which in Uint8List format
+  ///
+  /// [ecpairPriv] private key in Uint8List format
+  ///
+  /// Returns the address derived from the private key
+  String getAddressFromPriKey(Uint8List ecpairPriv) {
+    final publicKeyBytes = getPubKey(ecpairPriv);
+    // Get the address
+    final sha256Digest = SHA256Digest().process(publicKeyBytes);
+    final address = RIPEMD160Digest().process(sha256Digest);
+
+    return Bech32Encoder.encode(bech32MainPrefix, address);
+  }
+
   /// Get address from private key which in hex format
   ///
   /// [privateKeyHex] private key in hex format
@@ -126,6 +140,24 @@ class Kuchain with QueryRPC, JsonRPC {
     final ecPrivateKey = _getECPrivateKey(ecpairPriv);
     final ecPublicKey = _getECPublicKey(ecPrivateKey);
     return ecPublicKey.Q.getEncoded(true);
+  }
+
+  /// Generate private key from base64 string
+  ///
+  /// [priKeyBase64] private key in base64 string
+  ///
+  /// Returns Uint8List prikey
+  Uint8List importPriKeyBase64(String priKeyBase64) {
+    return base64.decode(priKeyBase64);
+  }
+
+  /// Generate base64 private key from private key in Uint8List
+  ///
+  /// [ecpairPriv] private key in Uint8List
+  ///
+  /// Returns prikey in base64 string
+  String exportPriKeyBase64(Uint8List ecpairPriv) {
+    return base64.encode(ecpairPriv);
   }
 
   /// Set bech32 main prefix
