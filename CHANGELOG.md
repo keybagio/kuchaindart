@@ -1,3 +1,6 @@
+## Version 0.2.0 - 2020-09-15
+* Fixed fetchMsg bug
+
 ## Version 0.1.9 - 2020-09-14
 * Add importPriKeyBase64 / exportPriKeyBase64 rpc
 * Fixed newProposalParamMsg rpc bug

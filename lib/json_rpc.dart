@@ -745,7 +745,7 @@ class JsonRPC {
         headers: {'Content-Type': 'application/json'}, body: json.encode(req));
 
     return _sortMsg(json.decode(msg.body) as Map<String, dynamic>,
-        req.base_req.payer as String);
+        req['base_req']['payer'] as String);
   }
 
   Future<Response> _httpPost(url,
