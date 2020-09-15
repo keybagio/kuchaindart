@@ -239,7 +239,7 @@ class JsonRPC {
   /// construct UnlockCoin Msg in JSON
   ///
   /// [account] account ID of locking coin
-  /// [amount] amount of coin to be issued
+  /// [amount] amount of coin to be unlocked
   /// [fee] fees = gas * gas-prices
   /// [gas] a special unit that is used to track the consumption of resources during execution
   /// [memo] memo
@@ -264,7 +264,7 @@ class JsonRPC {
   /// construct BurnCoin Msg in JSON
   ///
   /// [account] account ID of burning coin
-  /// [amount] amount of coin to be issued
+  /// [amount] amount of coin to be burned
   /// [fee] fees = gas * gas-prices
   /// [gas] a special unit that is used to track the consumption of resources during execution
   /// [memo] memo
@@ -284,6 +284,31 @@ class JsonRPC {
     };
 
     return fetchMsg(url + burnApi, reqData);
+  }
+
+  /// construct BurnCoin Msg in JSON
+  ///
+  /// [account] account ID of exercising coin
+  /// [amount] amount of coin to be exercised
+  /// [fee] fees = gas * gas-prices
+  /// [gas] a special unit that is used to track the consumption of resources during execution
+  /// [memo] memo
+  /// [gasAdjustment] max gas consumption rate of a transaction can take
+  ///
+  /// Returns standard message of Exercise
+  Future<Map<String, dynamic>> newExerciseMsg(String account, String amount,
+      [String fee = defaultFee,
+      String gas = defaultGas,
+      String memo = defaultMemo,
+      String gasAdjustment = defaultGasAdjustment]) async {
+    const exerciseApi = '/assets/exercise';
+    final reqData = {
+      'base_req': _sortBaseReq(chainId, fee, gas, memo, gasAdjustment, account),
+      'account': account,
+      'amount': amount,
+    };
+
+    return fetchMsg(url + exerciseApi, reqData);
   }
 
   /// construct Delegation Msg in JSON

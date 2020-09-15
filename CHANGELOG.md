@@ -1,3 +1,6 @@
+## Version 0.2.1 - 2020-09-15
+* Add newExerciseMsg rpc
+
 ## Version 0.2.0 - 2020-09-15
 * Fixed fetchMsg bug
 
