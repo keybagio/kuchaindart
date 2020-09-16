@@ -104,7 +104,6 @@ Future main() async {
     myAccount,
     'testaccount4',
     myAddress,
-    '2000',
   );
   print('\n newCreateAccMsg ======================');
   print(newCreateAccMsg);
@@ -124,7 +123,6 @@ Future main() async {
   //   myAddress,
   //   myAccount,
   //   '1000000000000000000$mainCoinDenom',
-  //   '2000',
   // );
   // final signedTransferMsgTx = await kuchain.sign(newTransferMsg, ecpairPriv);
   // final transferRes = await kuchain.broadcast(signedTransferMsgTx);
@@ -138,7 +136,6 @@ Future main() async {
   //   myAccount,
   //   'michael', // validator
   //   '100$mainCoinDenom',
-  //   '2000',
   // );
   // final signedDelegationMsgTx = await kuchain.sign(newDelegationMsg, ecpairPriv);
   // final delegationRes = await kuchain.broadcast(signedDelegationMsgTx);
@@ -153,7 +150,6 @@ Future main() async {
   //   'Proposal description',
   //   '500000000000000000000$mainCoinDenom',
   //   myAccount,
-  //   '2000',
   // );
   // final signedProposalMsgTx = await kuchain.sign(newProposalMsg, ecpairPriv);
   // final proposalMsg = await kuchain.broadcast(signedProposalMsgTx);

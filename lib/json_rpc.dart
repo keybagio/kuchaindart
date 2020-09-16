@@ -141,6 +141,7 @@ class JsonRPC {
   /// [maxSupply] max supply of coin to be created
   /// [canIssue] if can be issued
   /// [canLock] if can be locked
+  /// [canBurn] if can be burned
   /// [issueToHeight] issue_to_height
   /// [initSupply] init_supply
   /// [desc] desc of coin
@@ -157,6 +158,7 @@ class JsonRPC {
       // ignore: avoid_positional_boolean_parameters
       bool canIssue,
       bool canLock,
+      bool canBurn,
       String issueToHeight,
       String initSupply,
       String desc,
@@ -172,6 +174,7 @@ class JsonRPC {
       'max_supply': maxSupply,
       'can_issue': canIssue,
       'can_lock': canLock,
+      'can_burn': canBurn,
       'issue_to_height': issueToHeight,
       'init_supply': initSupply,
       'desc': desc,
@@ -723,7 +726,7 @@ class JsonRPC {
       if (msgs[i]['error'] != null && (msgs[i]['error'] as String).isNotEmpty) {
         throw Exception('Get Msg From Cli Error: ${json.encode(msgs[i])}');
       }
-      finalMsgs.add(msgs[i].msg[0]);
+      finalMsgs.add(msgs[i]['msg'][0]);
     }
 
     final auth = await _sortAuth(sender);

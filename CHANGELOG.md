@@ -1,3 +1,7 @@
+## Version 0.2.2 - 2020-09-16
+* Change coinType
+* Change newCreateCoinMsg rpc
+
 ## Version 0.2.1 - 2020-09-15
 * Add newExerciseMsg rpc
 

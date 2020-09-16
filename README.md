@@ -1,6 +1,6 @@
 # Kuchain Dart Library 
 
-Convert from [kuchainjs@0.0.7](https://www.npmjs.com/package/kuchainjs)
+Convert from [kuchainjs@0.0.9](https://www.npmjs.com/package/kuchainjs)
 
 This library supports kuchain address generation and verification. It enables you to create an offline signature functions of different types of transaction messages. 
 

@@ -24,7 +24,7 @@ class Kuchain with QueryRPC, JsonRPC {
   final QueryRPC queryRPC = QueryRPC();
 
   // m/purpse'/coin_type'/account'/change/address_index
-  String path = "m/44'/23808'/0'/0/0";
+  String path = "m/44'/556'/0'/0/0";
   String bech32MainPrefix = 'kuchain';
   @override
   String mainCoinDenom = 'kuchain/kcs';
