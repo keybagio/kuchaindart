@@ -348,14 +348,17 @@ class QueryRPC {
   }
 
   Future<Map<String, dynamic>> _httpGetAndDecode(String path) async {
-    print('_httpGetAndDecode url ================');
-    print(url + path);
+    // print('_httpGetAndDecode url ================');
+    // print(url + path);
 
     final response = await client.get(url + path);
+    final responseInUTF8 = Response.bytes(
+        response.bodyBytes, response.statusCode,
+        headers: {'content-type': 'application/json;charset=utf-8'});
 
-    print('_httpGetAndDecode response================');
-    print(response.body);
+    // print('_httpGetAndDecode response================');
+    // print(responseInUTF8.body);
 
-    return json.decode(response.body) as Map<String, dynamic>;
+    return json.decode(responseInUTF8.body) as Map<String, dynamic>;
   }
 }

@@ -776,8 +776,8 @@ class JsonRPC {
         req['base_req']['payer'] as String);
   }
 
-  Future<Response> _httpPost(url,
-      {Map<String, String> headers, body, Encoding encoding}) async {
+  Future<Response> _httpPost(String url,
+      {Map<String, String> headers, dynamic body, Encoding encoding}) async {
     // print('_httpPost url ================');
     // print(url);
     // print('_httpPost body ================');
@@ -785,9 +785,12 @@ class JsonRPC {
 
     final response = await client.post(url,
         headers: headers, body: body, encoding: encoding);
+    final responseInUTF8 = Response.bytes(
+        response.bodyBytes, response.statusCode,
+        headers: {'content-type': 'application/json;charset=utf-8'});
 
     // print('_httpPost response================');
-    // print(response.body);
-    return response;
+    // print(responseInUTF8.body);
+    return responseInUTF8;
   }
 }

@@ -1,3 +1,6 @@
+## Version 0.2.3 - 2020-09-18
+* Add http response default charset as utf8
+
 ## Version 0.2.2 - 2020-09-16
 * Change coinType
 * Change newCreateCoinMsg rpc
